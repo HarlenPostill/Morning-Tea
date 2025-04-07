@@ -5,8 +5,12 @@ import { ThemedView } from '@/components/ThemedView';
 import AlternateScrollView from '@/components/AlternateScrollView';
 import { Colors } from '@/constants/Colors';
 import { router } from 'expo-router';
+import { Picker } from '@react-native-picker/picker';
+
+import React, { useState } from 'react';
 
 export default function TabTwoScreen() {
+  const [day, setDay] = useState(1);
   return (
     <AlternateScrollView
       headerBackgroundColor={{ light: Colors.light.background, dark: Colors.dark.background }}>
@@ -14,9 +18,27 @@ export default function TabTwoScreen() {
         <ThemedText type="title">Daily Gauntlet</ThemedText>
       </ThemedView>
       <ThemedText>Try out today's daily gauntlet!</ThemedText>
-      <Button title="First Game" onPress={() => router.push('/game')} color={Colors.light.tint} />
-      <Button title="Second Game" onPress={() => router.push('/game')} color={Colors.light.tint} />
-      <Button title="Third Game" onPress={() => router.push('/game')} color={Colors.light.tint} />
+      <Picker selectedValue={day} onValueChange={itemValue => setDay(itemValue)}>
+        {[...Array(30)].map((_, index) => (
+          <Picker.Item key={index + 1} label={`Day ${index + 1}`} value={index + 1} />
+        ))}
+      </Picker>
+
+      <Button
+        title="First Game"
+        onPress={() => router.push(`/(games)/day${day}Game1`)}
+        color={Colors.light.tint}
+      />
+      <Button
+        title="Second Game"
+        onPress={() => router.push(`/(games)/day${day}Game2`)}
+        color={Colors.light.tint}
+      />
+      <Button
+        title="Third Game"
+        onPress={() => router.push(`/(games)/day${day}Game3`)}
+        color={Colors.light.tint}
+      />
     </AlternateScrollView>
   );
 }

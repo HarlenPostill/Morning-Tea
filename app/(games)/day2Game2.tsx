@@ -4,12 +4,11 @@ import { StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-export default function Game() {
+export default function Day2Game2() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Game 1 day 1' }} />
       <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen doesn't exist.</ThemedText>
+        <ThemedText type="title">Day 2 Game 2</ThemedText>
       </ThemedView>
     </>
   );

@@ -34,7 +34,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
-          name="game"
+          name="(games)"
           options={{
             contentStyle: {
               backgroundColor: Colors.light.background,
@@ -43,7 +43,7 @@ export default function RootLayout() {
             headerShown: true,
             headerBackVisible: true,
             headerBackTitle: 'Back',
-            headerTitle: 'Game 1',
+            headerTitle: 'Daily Gauntlet',
             headerTransparent: true,
             headerStyle: {
               backgroundColor: 'transparent',
