@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 
 import React, { useState } from 'react';
+import { AsyncStorageViewer } from '@/components/AsyncStorageViewer';
 
 export default function TabTwoScreen() {
   const [day, setDay] = useState(1);
@@ -39,6 +40,7 @@ export default function TabTwoScreen() {
         onPress={() => router.push(`/(games)/day${day}Game3`)}
         color={Colors.light.tint}
       />
+      <AsyncStorageViewer />
     </AlternateScrollView>
   );
 }
