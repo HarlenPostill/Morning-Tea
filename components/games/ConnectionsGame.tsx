@@ -130,7 +130,7 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
   useEffect(() => {
     const initializeGameState = async () => {
       try {
-        const savedGameState = await AsyncStorage.getItem(`connections-${gameId}`);
+        const savedGameState = await AsyncStorage.getItem(`connections_${gameId}`);
         if (savedGameState) {
           const parsedState = JSON.parse(savedGameState) as GameState;
           setGameState(parsedState);
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    maxWidth: 400,
+    maxWidth: 380,
   },
   grid: {
     width: '100%',
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
   wordContainer: {
     margin: 4,
     borderRadius: 6,
-    height: 50,
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',

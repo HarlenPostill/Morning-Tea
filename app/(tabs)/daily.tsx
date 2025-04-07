@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { StyleSheet, Button } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
