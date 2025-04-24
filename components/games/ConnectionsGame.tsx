@@ -74,7 +74,7 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
   gameId,
   categories,
   onComplete,
-  title = "Connection Time!",
+  title = "Today's Connections",
 }) => {
   // Screen width to calculate tile sizes
   const screenWidth = Dimensions.get("window").width;
@@ -355,8 +355,15 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
                             style={[
                               styles.wordText,
                               isSelected && styles.selectedWordText,
+                              word.text.indexOf(" ") === -1
+                                ? styles.singleWordText
+                                : styles.multiWordText,
                             ]}
-                            numberOfLines={2}
+                            adjustsFontSizeToFit={word.text.indexOf(" ") === -1}
+                            numberOfLines={
+                              word.text.indexOf(" ") === -1 ? 1 : 2
+                            }
+                            minimumFontScale={0.5}
                             ellipsizeMode="tail"
                           >
                             {word.text}
@@ -501,6 +508,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(239, 239, 230, 1)",
+    overflow: "hidden",
   },
   selectedTile: {
     backgroundColor: "rgba(90, 89, 78, 1)",
@@ -510,6 +518,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     color: "#000000",
+    flexShrink: 1,
+    flexWrap: "wrap",
+  },
+  multiWordText: {
+    lineHeight: 20,
+  },
+  singleWordText: {
+    lineHeight: 22,
   },
   selectedWordText: {
     color: "#FFFFFF",

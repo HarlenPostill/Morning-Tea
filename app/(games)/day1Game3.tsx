@@ -11,6 +11,7 @@ export default function Day1Game2() {
       <ThemedView style={styles.container}>
         <ConnectionsGame
           gameId="day1game1"
+          title="Harlens Connection"
           categories={[
             {
               id: "fruits",
