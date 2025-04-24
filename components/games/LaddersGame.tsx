@@ -33,6 +33,11 @@ interface GameState {
   completedTimestamp?: number;
 }
 
+// Custom word dictionary that persists across sessions
+interface WordDictionaryState {
+  customWords: string[];
+}
+
 // Define the keyboard layout
 const KEYBOARD_ROWS = [
   ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -40,8 +45,12 @@ const KEYBOARD_ROWS = [
   ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
 ];
 
-// Import word list (this would be a JSON file with valid 4-letter words)
-const VALID_WORDS = fourLetterWords;
+// Create a custom dictionary key for AsyncStorage
+const CUSTOM_DICTIONARY_KEY = 'ladders_custom_dictionary';
+
+// Process the imported fourLetterWords list to ensure all words are lowercase
+// This is more efficient than converting during gameplay
+const DEFAULT_VALID_WORDS = fourLetterWords.map(word => word.toLowerCase());
 
 const LaddersGame: React.FC<LaddersGameProps> = ({
   gameId,
@@ -62,6 +71,10 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
   // Animation value for winning celebration
   const [winAnimation] = useState(new Animated.Value(0));
 
+  // Valid words dictionary that includes both default and custom words
+  // We use a Set for O(1) lookup time instead of Array's O(n)
+  const [validWordsSet, setValidWordsSet] = useState<Set<string>>(new Set(DEFAULT_VALID_WORDS));
+
   // Game state
   const [gameState, setGameState] = useState<GameState>({
     status: 'playing',
@@ -74,17 +87,30 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
   // Loading state while checking AsyncStorage
   const [loading, setLoading] = useState(true);
 
-  // Initialize game from AsyncStorage
+  // Initialize game and load custom dictionary from AsyncStorage
   useEffect(() => {
     const initializeGameState = async () => {
       try {
+        // Load game state
         const savedGameState = await AsyncStorage.getItem(`ladders_${gameId}`);
         if (savedGameState) {
           const parsedState = JSON.parse(savedGameState) as GameState;
           setGameState(parsedState);
         }
+
+        // Load custom dictionary
+        const savedDictionary = await AsyncStorage.getItem(CUSTOM_DICTIONARY_KEY);
+        if (savedDictionary) {
+          const parsedDictionary = JSON.parse(savedDictionary) as WordDictionaryState;
+          // Create a new Set with both default and custom words
+          const combinedWordsSet = new Set([
+            ...DEFAULT_VALID_WORDS,
+            ...parsedDictionary.customWords,
+          ]);
+          setValidWordsSet(combinedWordsSet);
+        }
       } catch (error) {
-        console.error('Failed to load game state:', error);
+        console.error('Failed to load game state or dictionary:', error);
       } finally {
         setLoading(false);
       }
@@ -193,8 +219,46 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
       return false; // More than one letter has changed
     }
 
-    // Check if it's a valid word
-    return VALID_WORDS.includes(gameState.currentGuess);
+    // Check if it's a valid word using Set.has() which is O(1) operation
+    return validWordsSet.has(gameState.currentGuess);
+  };
+
+  // Function to add a new word to the custom dictionary
+  const addWordToDictionary = async () => {
+    try {
+      // Ensure the word is exactly 4 letters and not already in the dictionary
+      const newWord = gameState.currentGuess.toLowerCase();
+      if (newWord.length !== 4 || validWordsSet.has(newWord)) {
+        return;
+      }
+
+      // Add the word to our Set
+      const newValidWordsSet = new Set(validWordsSet);
+      newValidWordsSet.add(newWord);
+      setValidWordsSet(newValidWordsSet);
+
+      // Get all words from Set for filtering
+      const allWords = Array.from(newValidWordsSet);
+
+      // Save to AsyncStorage - only custom words
+      const customWords = allWords.filter(word => !DEFAULT_VALID_WORDS.includes(word));
+      const dictionaryState: WordDictionaryState = { customWords };
+      await AsyncStorage.setItem(CUSTOM_DICTIONARY_KEY, JSON.stringify(dictionaryState));
+
+      // Give feedback to the user
+      console.log(`Word "${newWord}" added to dictionary!`);
+
+      // Here you could add a toast notification like:
+      // Toast.show({
+      //   type: 'success',
+      //   text1: 'Word Added',
+      //   text2: `"${newWord}" has been added to your dictionary!`,
+      //   position: 'bottom',
+      //   visibilityTime: 2000,
+      // });
+    } catch (error) {
+      console.error('Failed to add word to dictionary:', error);
+    }
   };
 
   // Submit the current guess
@@ -366,9 +430,7 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
               {/* Button to add a new word to the valid word list */}
               <TouchableOpacity
                 style={[styles.confirmAltButton, isConfirmEnabled && styles.altDisabledButton]}
-                onPress={() => {
-                  console.log('Add Word');
-                }}
+                onPress={addWordToDictionary}
                 disabled={isConfirmEnabled}>
                 <Text style={[styles.confirmAltText]}>☝️🤓</Text>
               </TouchableOpacity>
