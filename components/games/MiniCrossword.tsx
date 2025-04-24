@@ -59,6 +59,7 @@ export interface CrosswordProps {
     backgroundColor?: string;
     cellBackgroundColor?: string;
     cellSelectedColor?: string;
+    cellHighlightedColor?: string;
     cellRevealedColor?: string;
     cellCorrectColor?: string;
     textColor?: string;
@@ -71,6 +72,7 @@ const defaultTheme = {
   backgroundColor: "#ffffff",
   cellBackgroundColor: "#ffffff",
   cellSelectedColor: "#a7d8ff",
+  cellHighlightedColor: "#FCDA00", // New yellow highlight color
   cellRevealedColor: "#ffeda3",
   cellCorrectColor: "#dfffdf",
   textColor: "#000000",
@@ -162,7 +164,7 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
             isDown: false,
             isRevealed: false,
             isCorrect: false,
-            isFilled: true,
+            isFilled: false, // Start with all cells not filled
             userInput: "",
           }))
       );
@@ -171,6 +173,7 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     for (const clue of acrossClues) {
       for (const [row, col] of clue.cells) {
         newGrid[row][col].isAcross = true;
+        newGrid[row][col].isFilled = true; // Mark cells part of clues as filled
 
         // Set clue number for the first cell in the clue
         if (row === clue.cells[0][0] && col === clue.cells[0][1]) {
@@ -182,6 +185,7 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     for (const clue of downClues) {
       for (const [row, col] of clue.cells) {
         newGrid[row][col].isDown = true;
+        newGrid[row][col].isFilled = true; // Mark cells part of clues as filled
 
         // Set clue number for the first cell in the clue
         if (row === clue.cells[0][0] && col === clue.cells[0][1]) {
@@ -202,8 +206,26 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     }
 
     setGrid(newGrid);
-    setSelectedCell({ row: 0, col: 0 });
-    setSelectedClue(getClueNumberFromCell(0, 0, newGrid, "across"));
+
+    // Find the first fillable cell for initial selection
+    let initialRow = 0;
+    let initialCol = 0;
+
+    // Find first cell that's part of a clue
+    outerLoop: for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        if (newGrid[r][c].isFilled) {
+          initialRow = r;
+          initialCol = c;
+          break outerLoop;
+        }
+      }
+    }
+
+    setSelectedCell({ row: initialRow, col: initialCol });
+    setSelectedClue(
+      getClueNumberFromCell(initialRow, initialCol, newGrid, "across")
+    );
   };
 
   // Load saved game state from AsyncStorage
@@ -638,23 +660,7 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
           getClueNumberFromCell(rowIndex, colIndex, grid, "down") ===
             selectedClue));
 
-    let cellBgColor = mergedTheme.cellBackgroundColor;
-    if (isSelected) {
-      cellBgColor = mergedTheme.cellSelectedColor;
-    } else if (isHighlighted) {
-      cellBgColor = mergedTheme.cellSelectedColor;
-      // Make it slightly lighter than the selected cell
-      cellBgColor = cellBgColor.replace(
-        /rgb\((\d+), (\d+), (\d+)\)/,
-        (_, r, g, b) => `rgba(${r}, ${g}, ${b}, 0.7)`
-      );
-    } else if (cell.isRevealed) {
-      cellBgColor = mergedTheme.cellRevealedColor;
-    } else if (cell.isCorrect) {
-      cellBgColor = mergedTheme.cellCorrectColor;
-    }
-
-    // Only render cells that are part of the puzzle
+    // If cell is not filled (not part of any clue), render it as black
     if (!cell.isFilled) {
       return (
         <View
@@ -662,6 +668,21 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
           style={[styles.cell, { backgroundColor: "#000000" }]}
         />
       );
+    }
+
+    // Determine the cell background color based on its state
+    let cellBgColor = mergedTheme.cellBackgroundColor;
+
+    if (isSelected) {
+      // Current selected cell gets the yellow highlight
+      cellBgColor = mergedTheme.cellHighlightedColor;
+    } else if (isHighlighted) {
+      // Cells in the same clue get the blue highlight
+      cellBgColor = mergedTheme.cellSelectedColor;
+    } else if (cell.isRevealed) {
+      cellBgColor = mergedTheme.cellRevealedColor;
+    } else if (cell.isCorrect) {
+      cellBgColor = mergedTheme.cellCorrectColor;
     }
 
     return (
@@ -899,7 +920,6 @@ const styles = StyleSheet.create({
   clueBar: {
     flexDirection: "row",
     backgroundColor: "rgb(255, 255, 255)",
-
     height: 61,
     alignItems: "center",
     justifyContent: "space-between",
@@ -908,7 +928,6 @@ const styles = StyleSheet.create({
   clueNavButton: {
     width: 40,
     backgroundColor: "rgba(167, 216, 255, 1)",
-
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
