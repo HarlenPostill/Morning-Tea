@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
@@ -9,6 +11,8 @@ import {
   Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import fourLetterWords from '@assets/fourLetterWords.json';
 
 // Types for our props and state
 interface LaddersGameProps {
@@ -37,38 +41,7 @@ const KEYBOARD_ROWS = [
 ];
 
 // Import word list (this would be a JSON file with valid 4-letter words)
-// For now, we'll use a small sample of words for testing
-const VALID_WORDS = [
-  'reel',
-  'real',
-  'meal',
-  'seal',
-  'seat',
-  'slat',
-  'slip',
-  'bins',
-  'bing',
-  'king',
-  'kong',
-  'fish',
-  'word',
-  'wore',
-  'fore',
-  'ford',
-  'fond',
-  'find',
-  'fine',
-  'five',
-  'fire',
-  'gate',
-  'late',
-  'lake',
-  'lane',
-  'line',
-  'pine',
-  'pink',
-  // Add more valid 4-letter words as needed
-];
+const VALID_WORDS = fourLetterWords;
 
 const LaddersGame: React.FC<LaddersGameProps> = ({
   gameId,

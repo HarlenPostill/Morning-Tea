@@ -408,6 +408,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    backgroundColor: '#fff',
     justifyContent: 'space-between',
     padding: 10,
   },
@@ -444,7 +445,7 @@ const styles = StyleSheet.create({
   },
   keyboardContainer: {
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: 30,
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
