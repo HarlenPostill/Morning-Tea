@@ -62,6 +62,7 @@ interface ConnectionsGameProps {
 
 // State for our game
 interface GameState {
+  shuffleKey: number;
   status: "playing" | "won";
   selectedWords: Word[];
   solvedCategories: string[];
@@ -106,6 +107,7 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
 
   // Game state
   const [gameState, setGameState] = useState<GameState>({
+    shuffleKey: 0,
     status: "playing",
     selectedWords: [],
     solvedCategories: [],
