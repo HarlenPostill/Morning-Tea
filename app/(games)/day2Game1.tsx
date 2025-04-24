@@ -1,22 +1,21 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { Link, Stack } from "expo-router";
+import { StyleSheet } from "react-native";
 
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { MiniCrossword } from '@/components/games/MiniCrossword';
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { MiniCrossword } from "@/components/games/MiniCrossword";
 
 export default function Day2Game1() {
   return (
     <>
       <ThemedView style={styles.container}>
-        <ThemedText type="title">The Mini</ThemedText>
         <MiniCrossword
           gameId="day1game1"
           acrossClues={[
             {
               number: 1,
-              text: 'Taxi',
-              answer: 'CAB',
+              text: "Taxi",
+              answer: "CAB",
               cells: [
                 [0, 0],
                 [0, 1],
@@ -25,8 +24,8 @@ export default function Day2Game1() {
             },
             {
               number: 4,
-              text: 'Expression of surprise',
-              answer: 'WOW',
+              text: "Expression of surprise",
+              answer: "WOW",
               cells: [
                 [1, 0],
                 [1, 1],
@@ -35,8 +34,8 @@ export default function Day2Game1() {
             },
             {
               number: 7,
-              text: 'Computer file name extension',
-              answer: 'DOC',
+              text: "Computer file name extension",
+              answer: "DOC",
               cells: [
                 [2, 2],
                 [2, 3],
@@ -45,8 +44,8 @@ export default function Day2Game1() {
             },
             {
               number: 8,
-              text: 'Spherical object',
-              answer: 'BALL',
+              text: "Spherical object",
+              answer: "BALL",
               cells: [
                 [3, 0],
                 [3, 1],
@@ -56,8 +55,8 @@ export default function Day2Game1() {
             },
             {
               number: 9,
-              text: 'Consume',
-              answer: 'EAT',
+              text: "Consume",
+              answer: "EAT",
               cells: [
                 [4, 2],
                 [4, 3],
@@ -68,8 +67,8 @@ export default function Day2Game1() {
           downClues={[
             {
               number: 1,
-              text: 'Nocturnal flying mammal',
-              answer: 'BAT',
+              text: "Nocturnal flying mammal",
+              answer: "BAT",
               cells: [
                 [0, 0],
                 [1, 0],
@@ -78,8 +77,8 @@ export default function Day2Game1() {
             },
             {
               number: 2,
-              text: 'Unit of corn',
-              answer: 'COB',
+              text: "Unit of corn",
+              answer: "COB",
               cells: [
                 [0, 1],
                 [1, 1],
@@ -88,8 +87,8 @@ export default function Day2Game1() {
             },
             {
               number: 3,
-              text: 'Small carpet',
-              answer: 'MAT',
+              text: "Small carpet",
+              answer: "MAT",
               cells: [
                 [0, 2],
                 [1, 2],
@@ -98,8 +97,8 @@ export default function Day2Game1() {
             },
             {
               number: 5,
-              text: 'Informal negative',
-              answer: 'NOPE',
+              text: "Informal negative",
+              answer: "NOPE",
               cells: [
                 [1, 3],
                 [2, 3],
@@ -109,8 +108,8 @@ export default function Day2Game1() {
             },
             {
               number: 6,
-              text: 'Distant',
-              answer: 'FAR',
+              text: "Distant",
+              answer: "FAR",
               cells: [
                 [2, 4],
                 [3, 4],
@@ -118,11 +117,11 @@ export default function Day2Game1() {
               ],
             },
           ]}
-          onComplete={time => console.log(`Completed in ${time} seconds`)}
+          onComplete={(time) => console.log(`Completed in ${time} seconds`)}
           // Optional custom theme
           theme={{
-            cellSelectedColor: '#a7d8ff',
-            cellBackgroundColor: '#ffffff',
+            cellSelectedColor: "#a7d8ff",
+            cellBackgroundColor: "#ffffff",
           }}
         />
       </ThemedView>
@@ -133,9 +132,8 @@ export default function Day2Game1() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 100,
   },
 });
