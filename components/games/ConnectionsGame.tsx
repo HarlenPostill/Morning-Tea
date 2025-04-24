@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -7,35 +7,37 @@ import {
   Animated,
   Dimensions,
   ActivityIndicator,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Category color palette similar to NYT Connections
 const CATEGORY_COLORS = {
   yellow: {
-    light: '#f9df6d',
-    dark: '#cba92b',
-    text: '#000000',
+    light: "#f9df6d",
+    dark: "#cba92b",
+    text: "#000000",
   },
   green: {
-    light: '#a0c35a',
-    dark: '#647e32',
-    text: '#000000',
+    light: "#a0c35a",
+    dark: "#647e32",
+    text: "#000000",
   },
   blue: {
-    light: '#6aacee',
-    dark: '#3170b2',
-    text: '#000000',
+    light: "#6aacee",
+    dark: "#3170b2",
+    text: "#000000",
   },
   purple: {
-    light: '#b48edf',
-    dark: '#8b62c3',
-    text: '#000000',
+    light: "#b48edf",
+    dark: "#8b62c3",
+    text: "#000000",
   },
 };
 
 // Get all colors in an array for easy indexing
-const COLOR_KEYS = Object.keys(CATEGORY_COLORS) as Array<keyof typeof CATEGORY_COLORS>;
+const COLOR_KEYS = Object.keys(CATEGORY_COLORS) as Array<
+  keyof typeof CATEGORY_COLORS
+>;
 
 // Types for our props
 interface Word {
@@ -55,15 +57,15 @@ interface ConnectionsGameProps {
   gameId: string; // Unique identifier for the game, e.g., 'day1game1'
   categories: Category[];
   onComplete?: (success: boolean) => void;
-  maxAttempts?: number;
+  title?: string;
 }
 
 // State for our game
 interface GameState {
-  status: 'playing' | 'won' | 'lost';
+  status: "playing" | "won";
   selectedWords: Word[];
   solvedCategories: string[];
-  attempts: number;
+  mistakes: number;
   revealingCategory: string | null;
   completedTimestamp?: number;
 }
@@ -72,10 +74,10 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
   gameId,
   categories,
   onComplete,
-  maxAttempts = 4,
+  title = "Connection Time!",
 }) => {
   // Screen width to calculate tile sizes
-  const screenWidth = Dimensions.get('window').width;
+  const screenWidth = Dimensions.get("window").width;
 
   // Validate the number of categories (2-4)
   const validatedCategories = useMemo(() => {
@@ -89,8 +91,8 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
   // Derive the words from the categories
   const allWords = useMemo(() => {
     let words: Word[] = [];
-    validatedCategories.forEach(category => {
-      const categoryWords = category.words.map(word => ({
+    validatedCategories.forEach((category) => {
+      const categoryWords = category.words.map((word) => ({
         id: `${category.id}-${word}`,
         text: word,
         categoryId: category.id,
@@ -104,39 +106,32 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
 
   // Game state
   const [gameState, setGameState] = useState<GameState>({
-    status: 'playing',
+    status: "playing",
     selectedWords: [],
     solvedCategories: [],
-    attempts: 0,
+    mistakes: 0,
     revealingCategory: null,
   });
 
-  // Animation values for revealing categories
+  // Animation value for revealing categories
   const [revealAnim] = useState(new Animated.Value(0));
 
   // Loading state while checking AsyncStorage
   const [loading, setLoading] = useState(true);
 
-  // Get rows and columns based on total word count
-  const gridSize = useMemo(() => {
-    const totalWords = allWords.length;
-    if (totalWords <= 9) return { rows: 3, cols: 3 };
-    if (totalWords <= 12) return { rows: 3, cols: 4 };
-    if (totalWords <= 16) return { rows: 4, cols: 4 };
-    return { rows: 4, cols: 4 }; // Default to 4x4
-  }, [allWords]);
-
   // Initialize game from AsyncStorage
   useEffect(() => {
     const initializeGameState = async () => {
       try {
-        const savedGameState = await AsyncStorage.getItem(`connections_${gameId}`);
+        const savedGameState = await AsyncStorage.getItem(
+          `connections_${gameId}`
+        );
         if (savedGameState) {
           const parsedState = JSON.parse(savedGameState) as GameState;
           setGameState(parsedState);
         }
       } catch (error) {
-        console.error('Failed to load game state:', error);
+        console.error("Failed to load game state:", error);
       } finally {
         setLoading(false);
       }
@@ -151,99 +146,50 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
       if (loading) return; // Don't save while loading
 
       try {
-        await AsyncStorage.setItem(`connections-${gameId}`, JSON.stringify(gameState));
+        await AsyncStorage.setItem(
+          `connections_${gameId}`,
+          JSON.stringify(gameState)
+        );
       } catch (error) {
-        console.error('Failed to save game state:', error);
+        console.error("Failed to save game state:", error);
       }
     };
 
     saveGameState();
   }, [gameState, gameId, loading]);
 
-  // Handle win/lose conditions
+  // Handle win condition
   useEffect(() => {
     if (
       gameState.solvedCategories.length === validatedCategories.length &&
-      gameState.status === 'playing'
+      gameState.status === "playing"
     ) {
-      setGameState(prev => ({
+      setGameState((prev) => ({
         ...prev,
-        status: 'won',
+        status: "won",
         completedTimestamp: Date.now(),
       }));
       onComplete?.(true);
-    } else if (gameState.attempts >= maxAttempts && gameState.status === 'playing') {
-      setGameState(prev => ({
-        ...prev,
-        status: 'lost',
-        completedTimestamp: Date.now(),
-      }));
-      onComplete?.(false);
     }
   }, [
     gameState.solvedCategories,
-    gameState.attempts,
     validatedCategories.length,
-    maxAttempts,
     onComplete,
     gameState.status,
   ]);
 
-  // Handle revealing categories animation when game is lost
-  useEffect(() => {
-    if (gameState.status === 'lost' && !gameState.revealingCategory) {
-      revealUnsolvedCategories();
-    }
-  }, [gameState.status]);
-
-  // Reveal the categories one by one when the game is lost
-  const revealUnsolvedCategories = useCallback(() => {
-    const unsolvedCategories = validatedCategories
-      .filter(cat => !gameState.solvedCategories.includes(cat.id))
-      .map(cat => cat.id);
-
-    if (unsolvedCategories.length === 0) return;
-
-    const categoryToReveal = unsolvedCategories[0];
-
-    setGameState(prev => ({
-      ...prev,
-      revealingCategory: categoryToReveal,
-    }));
-
-    // Start reveal animation
-    revealAnim.setValue(0);
-    Animated.timing(revealAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start(() => {
-      // After animation completes, add this category to solved list
-      setGameState(prev => ({
-        ...prev,
-        solvedCategories: [...prev.solvedCategories, categoryToReveal],
-        revealingCategory: null,
-      }));
-
-      // Slight delay before revealing the next category
-      setTimeout(() => {
-        revealUnsolvedCategories();
-      }, 500);
-    });
-  }, [validatedCategories, gameState.solvedCategories, revealAnim]);
-
   // Toggle word selection
   const toggleWordSelection = (word: Word) => {
-    if (gameState.status !== 'playing') return;
+    if (gameState.status !== "playing") return;
 
     // Check if the word is already in a solved category
     if (gameState.solvedCategories.includes(word.categoryId)) return;
 
     // If the word is already selected, remove it
-    if (gameState.selectedWords.some(w => w.id === word.id)) {
-      setGameState(prev => ({
+    if (gameState.selectedWords.some((w) => w.id === word.id)) {
+      setGameState((prev) => ({
         ...prev,
-        selectedWords: prev.selectedWords.filter(w => w.id !== word.id),
+        selectedWords: prev.selectedWords.filter((w) => w.id !== word.id),
       }));
       return;
     }
@@ -252,7 +198,7 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
     if (gameState.selectedWords.length >= 4) return;
 
     // Add the word to selected words
-    setGameState(prev => ({
+    setGameState((prev) => ({
       ...prev,
       selectedWords: [...prev.selectedWords, word],
     }));
@@ -264,20 +210,22 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
 
     // Check if all selected words are from the same category
     const categoryId = gameState.selectedWords[0].categoryId;
-    const allSameCategory = gameState.selectedWords.every(w => w.categoryId === categoryId);
+    const allSameCategory = gameState.selectedWords.every(
+      (w) => w.categoryId === categoryId
+    );
 
     if (allSameCategory) {
       // Correct selection
-      setGameState(prev => ({
+      setGameState((prev) => ({
         ...prev,
         solvedCategories: [...prev.solvedCategories, categoryId],
         selectedWords: [],
       }));
     } else {
-      // Incorrect selection
-      setGameState(prev => ({
+      // Incorrect selection - increment mistakes
+      setGameState((prev) => ({
         ...prev,
-        attempts: prev.attempts + 1,
+        mistakes: prev.mistakes + 1,
         selectedWords: [],
       }));
     }
@@ -285,15 +233,24 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
 
   // Reset current selection
   const resetSelection = () => {
-    setGameState(prev => ({
+    setGameState((prev) => ({
       ...prev,
       selectedWords: [],
     }));
   };
 
+  // Shuffle the remaining words
+  const shuffleWords = () => {
+    // We'll implement this by forcing a re-render with a new memo dependency
+    setGameState((prev) => ({
+      ...prev,
+      shuffleKey: (prev.shuffleKey || 0) + 1,
+    }));
+  };
+
   // Check if a word is currently selected
   const isWordSelected = (word: Word) => {
-    return gameState.selectedWords.some(w => w.id === word.id);
+    return gameState.selectedWords.some((w) => w.id === word.id);
   };
 
   // Check if a word is in a solved category
@@ -301,57 +258,36 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
     return gameState.solvedCategories.includes(word.categoryId);
   };
 
-  // Check if a word is in the category being revealed
-  const isWordRevealing = (word: Word) => {
-    return gameState.revealingCategory === word.categoryId;
+  // Get the category object for a given category ID
+  const getCategory = (categoryId: string) => {
+    return validatedCategories.find((c) => c.id === categoryId);
   };
 
-  // Get the opacity for a word based on its state
-  const getWordOpacity = (word: Word) => {
-    if (isWordSolved(word)) return 1;
-    if (isWordRevealing(word)) return revealAnim;
-    return 1;
+  // Get words in a given category
+  const getWordsInCategory = (categoryId: string) => {
+    return allWords.filter((word) => word.categoryId === categoryId);
   };
 
-  // Get the background color for a word based on its state
-  const getWordBackgroundColor = (word: Word) => {
-    if (isWordSolved(word) || isWordRevealing(word)) {
-      const category = validatedCategories.find(c => c.id === word.categoryId);
-      if (category?.color) {
-        return CATEGORY_COLORS[category.color].light;
+  // Group words by status (solved or unsolved)
+  const groupedWords = useMemo(() => {
+    const solved: { [categoryId: string]: Word[] } = {};
+    const unsolved: Word[] = [];
+
+    gameState.solvedCategories.forEach((categoryId) => {
+      solved[categoryId] = getWordsInCategory(categoryId);
+    });
+
+    allWords.forEach((word) => {
+      if (!gameState.solvedCategories.includes(word.categoryId)) {
+        unsolved.push(word);
       }
-    }
-    if (isWordSelected(word)) {
-      return '#d4d4d8'; // Selected but not submitted
-    }
-    return '#ffffff'; // Default
-  };
+    });
 
-  // Get the text color for a word based on its state
-  const getWordTextColor = (word: Word) => {
-    if (isWordSolved(word) || isWordRevealing(word)) {
-      const category = validatedCategories.find(c => c.id === word.categoryId);
-      if (category?.color) {
-        return CATEGORY_COLORS[category.color].text;
-      }
-    }
-    return '#000000'; // Default
-  };
+    // Shuffle unsolved words
+    const shuffledUnsolved = [...unsolved].sort(() => Math.random() - 0.5);
 
-  // Get the category name for a solved group
-  const getCategoryName = (categoryId: string) => {
-    const category = validatedCategories.find(c => c.id === categoryId);
-    return category?.name || 'Unknown';
-  };
-
-  // Get the color for a category
-  const getCategoryColor = (categoryId: string) => {
-    const category = validatedCategories.find(c => c.id === categoryId);
-    if (category?.color) {
-      return CATEGORY_COLORS[category.color];
-    }
-    return CATEGORY_COLORS.yellow; // Default
-  };
+    return { solved, unsolved: shuffledUnsolved };
+  }, [allWords, gameState.solvedCategories, gameState.shuffleKey]);
 
   if (loading) {
     return (
@@ -363,118 +299,135 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
 
   return (
     <View style={styles.container}>
+      <Text style={styles.gameTitle}>{title}</Text>
+
       {/* Game board */}
       <View style={styles.board}>
-        {/* Grid of words */}
-        <View
-          style={[
-            styles.grid,
-            {
-              gridTemplateColumns: `repeat(${gridSize.cols}, 1fr)`,
-              gridTemplateRows: `repeat(${gridSize.rows}, 1fr)`,
-            },
-          ]}>
-          {allWords.map(word => {
-            const isInSolvedCategory = isWordSolved(word);
-            const isInRevealingCategory = isWordRevealing(word);
+        {/* Solved categories */}
+        {Object.entries(groupedWords.solved).map(([categoryId, words]) => {
+          const category = getCategory(categoryId);
+          const categoryColor = CATEGORY_COLORS[category?.color || "yellow"];
 
-            return (
-              <Animated.View
-                key={word.id}
-                style={[
-                  styles.wordContainer,
-                  {
-                    opacity: getWordOpacity(word),
-                    backgroundColor: getWordBackgroundColor(word),
-                    borderColor: isWordSelected(word) ? '#000' : '#d4d4d8',
-                    borderWidth: isWordSelected(word) ? 2 : 1,
-                    width: (screenWidth * 0.85) / gridSize.cols - 8,
-                  },
-                ]}>
-                <TouchableOpacity
-                  style={styles.wordButton}
-                  onPress={() => toggleWordSelection(word)}
-                  disabled={isInSolvedCategory || gameState.status !== 'playing'}>
-                  <Text
-                    style={[styles.wordText, { color: getWordTextColor(word) }]}
-                    numberOfLines={2}
-                    ellipsizeMode="tail">
-                    {word.text}
-                  </Text>
-                </TouchableOpacity>
-              </Animated.View>
-            );
-          })}
-        </View>
-
-        {/* Game controls */}
-        {gameState.status === 'playing' && (
-          <View style={styles.controls}>
-            <Text style={styles.attemptsText}>
-              {maxAttempts - gameState.attempts} mistakes remaining
-            </Text>
-            <View style={styles.buttonsContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  styles.resetButton,
-                  gameState.selectedWords.length === 0 && styles.disabledButton,
-                ]}
-                onPress={resetSelection}
-                disabled={gameState.selectedWords.length === 0}>
-                <Text style={styles.buttonText}>Deselect All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  styles.submitButton,
-                  gameState.selectedWords.length !== 4 && styles.disabledButton,
-                ]}
-                onPress={submitSelection}
-                disabled={gameState.selectedWords.length !== 4}>
-                <Text style={styles.buttonText}>Submit</Text>
-              </TouchableOpacity>
+          return (
+            <View
+              key={categoryId}
+              style={[
+                styles.completedGrid,
+                { backgroundColor: categoryColor.light },
+              ]}
+            >
+              <Text
+                style={[styles.categoryName, { color: categoryColor.text }]}
+              >
+                {category?.name.toUpperCase()}
+              </Text>
+              <Text
+                style={[styles.categoryWords, { color: categoryColor.text }]}
+              >
+                {words.map((w) => w.text).join(", ")}
+              </Text>
             </View>
+          );
+        })}
+
+        {/* Unsolved words grid */}
+        {gameState.status === "playing" && groupedWords.unsolved.length > 0 && (
+          <View style={styles.grid}>
+            {Array(Math.ceil(groupedWords.unsolved.length / 4))
+              .fill(0)
+              .map((_, rowIndex) => (
+                <View key={`row-${rowIndex}`} style={styles.row}>
+                  {groupedWords.unsolved
+                    .slice(rowIndex * 4, rowIndex * 4 + 4)
+                    .map((word) => {
+                      const isSelected = isWordSelected(word);
+                      return (
+                        <TouchableOpacity
+                          key={word.id}
+                          style={[
+                            styles.tile,
+                            isSelected && styles.selectedTile,
+                          ]}
+                          onPress={() => toggleWordSelection(word)}
+                          disabled={gameState.status !== "playing"}
+                        >
+                          <Text
+                            style={[
+                              styles.wordText,
+                              isSelected && styles.selectedWordText,
+                            ]}
+                            numberOfLines={2}
+                            ellipsizeMode="tail"
+                          >
+                            {word.text}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                </View>
+              ))}
           </View>
         )}
 
-        {/* Solved categories list */}
-        {gameState.solvedCategories.length > 0 && (
-          <View style={styles.solvedCategories}>
-            {gameState.solvedCategories.map(categoryId => {
-              const categoryColor = getCategoryColor(categoryId);
-              return (
-                <View
-                  key={categoryId}
-                  style={[styles.solvedCategory, { backgroundColor: categoryColor.light }]}>
-                  <Text style={[styles.categoryName, { color: categoryColor.text }]}>
-                    {getCategoryName(categoryId)}
-                  </Text>
-                  <View style={styles.categoryWords}>
-                    {allWords
-                      .filter(word => word.categoryId === categoryId)
-                      .map(word => (
-                        <Text
-                          key={word.id}
-                          style={[styles.categoryWordText, { color: categoryColor.text }]}
-                          numberOfLines={1}
-                          ellipsizeMode="tail">
-                          {word.text}
-                        </Text>
-                      ))}
-                  </View>
-                </View>
-              );
-            })}
+        {/* Mistakes counter */}
+        <Text style={styles.mistakesText}>
+          {`Mistakes Made: ${gameState.mistakes}`}
+        </Text>
+
+        {/* Game controls */}
+        {gameState.status === "playing" && (
+          <View style={styles.controls}>
+            <TouchableOpacity
+              style={styles.shuffleButton}
+              onPress={shuffleWords}
+            >
+              <Text style={styles.buttonText}>Shuffle</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.deselectButton,
+                gameState.selectedWords.length === 0 && styles.disabledButton,
+              ]}
+              onPress={resetSelection}
+              disabled={gameState.selectedWords.length === 0}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  gameState.selectedWords.length === 0 &&
+                    styles.disabledButtonText,
+                ]}
+              >
+                Deselect All
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.submitButton,
+                gameState.selectedWords.length !== 4 && styles.disabledButton,
+              ]}
+              onPress={submitSelection}
+              disabled={gameState.selectedWords.length !== 4}
+            >
+              <Text
+                style={[
+                  styles.submitButtonText,
+                  gameState.selectedWords.length !== 4 &&
+                    styles.disabledButtonText,
+                ]}
+              >
+                Submit
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
 
         {/* Game over message */}
-        {gameState.status !== 'playing' && (
+        {gameState.status === "won" && (
           <View style={styles.gameOverContainer}>
-            <Text style={styles.gameOverText}>
-              {gameState.status === 'won' ? 'All connections found!' : 'No more attempts!'}
-            </Text>
+            <Text style={styles.gameOverText}>All connections found!</Text>
           </View>
         )}
       </View>
@@ -485,119 +438,147 @@ const ConnectionsGame: React.FC<ConnectionsGameProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "flex-start",
     paddingHorizontal: 10,
+    paddingTop: 20,
   },
   loadingContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gameTitle: {
+    color: "#000000",
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "500",
+    letterSpacing: 0.8,
+    marginBottom: 20,
   },
   board: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: "100%",
     maxWidth: 380,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: 8,
+  },
+  completedGrid: {
+    width: 380,
+    height: 89,
+    paddingVertical: 12,
+    borderRadius: 6,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    rowGap: 2,
+  },
+  categoryName: {
+    fontSize: 16,
+    fontWeight: "800",
+    textAlign: "center",
+  },
+  categoryWords: {
+    fontSize: 16,
+    fontWeight: "500",
+    textAlign: "center",
   },
   grid: {
-    width: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 10,
+    width: "100%",
+    gap: 8,
   },
-  wordContainer: {
-    margin: 4,
+  row: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  tile: {
+    flex: 1,
+    aspectRatio: 1,
+    padding: 6,
     borderRadius: 6,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(239, 239, 230, 1)",
   },
-  wordButton: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 4,
+  selectedTile: {
+    backgroundColor: "rgba(90, 89, 78, 1)",
   },
   wordText: {
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    color: "#000000",
+  },
+  selectedWordText: {
+    color: "#FFFFFF",
+  },
+  mistakesText: {
     fontSize: 14,
-    fontWeight: '500',
-    textAlign: 'center',
+    fontWeight: "500",
+    color: "rgba(90, 89, 78, 1)",
+    marginTop: 20,
+    marginBottom: 10,
+    letterSpacing: 0.4,
   },
   controls: {
-    width: '100%',
-    marginTop: 20,
-    alignItems: 'center',
+    width: "100%",
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
   },
-  attemptsText: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 10,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 10,
-  },
-  button: {
-    paddingVertical: 12,
+  shuffleButton: {
+    paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minWidth: 120,
+    borderRadius: 99,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#000000",
   },
-  resetButton: {
-    backgroundColor: '#d1d5db',
+  deselectButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 99,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#000000",
   },
   submitButton: {
-    backgroundColor: '#3b82f6',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 99,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000000",
   },
   disabledButton: {
-    opacity: 0.5,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "rgba(139, 139, 139, 1)",
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#ffffff',
+    fontWeight: "500",
+    color: "#000000",
   },
-  solvedCategories: {
-    width: '100%',
-    marginTop: 20,
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#fff",
   },
-  solvedCategory: {
-    width: '100%',
-    padding: 12,
-    borderRadius: 6,
-    marginBottom: 10,
-  },
-  categoryName: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  categoryWords: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  categoryWordText: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginRight: 8,
-    marginBottom: 4,
+  disabledButtonText: {
+    color: "rgba(139, 139, 139, 1)",
   },
   gameOverContainer: {
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   gameOverText: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });
 
