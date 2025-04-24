@@ -124,11 +124,6 @@ export default function Day2Game1() {
             },
           ]}
           onComplete={(time) => console.log(`Completed in ${time} seconds`)}
-          // Optional custom theme
-          theme={{
-            cellSelectedColor: "#a7d8ff",
-            cellBackgroundColor: "#ffffff",
-          }}
         />
       </ThemedView>
     </>
