@@ -9,7 +9,7 @@ export function HapticTab(props: BottomTabBarButtonProps) {
       {...props}
       onPressIn={ev => {
         if (process.env.EXPO_OS === 'ios') {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
         }
         props.onPressIn?.(ev);
       }}

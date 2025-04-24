@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,8 +7,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Animated,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Types for our props and state
 interface LaddersGameProps {
@@ -21,7 +21,7 @@ interface LaddersGameProps {
 
 // State for our game
 interface GameState {
-  status: "playing" | "won";
+  status: 'playing' | 'won';
   previousGuesses: string[];
   currentGuess: string;
   selectedLetterIndex: number | null;
@@ -31,42 +31,42 @@ interface GameState {
 
 // Define the keyboard layout
 const KEYBOARD_ROWS = [
-  ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-  ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
-  ["z", "x", "c", "v", "b", "n", "m"],
+  ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+  ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+  ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
 ];
 
 // Import word list (this would be a JSON file with valid 4-letter words)
 // For now, we'll use a small sample of words for testing
 const VALID_WORDS = [
-  "reel",
-  "real",
-  "meal",
-  "seal",
-  "seat",
-  "slat",
-  "slip",
-  "bins",
-  "bing",
-  "king",
-  "kong",
-  "fish",
-  "word",
-  "wore",
-  "fore",
-  "ford",
-  "fond",
-  "find",
-  "fine",
-  "five",
-  "fire",
-  "gate",
-  "late",
-  "lake",
-  "lane",
-  "line",
-  "pine",
-  "pink",
+  'reel',
+  'real',
+  'meal',
+  'seal',
+  'seat',
+  'slat',
+  'slip',
+  'bins',
+  'bing',
+  'king',
+  'kong',
+  'fish',
+  'word',
+  'wore',
+  'fore',
+  'ford',
+  'fond',
+  'find',
+  'fine',
+  'five',
+  'fire',
+  'gate',
+  'late',
+  'lake',
+  'lane',
+  'line',
+  'pine',
+  'pink',
   // Add more valid 4-letter words as needed
 ];
 
@@ -75,7 +75,7 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
   startWord,
   goalWord,
   onComplete,
-  title = "Ladders",
+  title = 'Ladders',
 }) => {
   // Validate the start and goal words - ensure they're 4 letters
   const validStartWord = useMemo(() => {
@@ -91,7 +91,7 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
 
   // Game state
   const [gameState, setGameState] = useState<GameState>({
-    status: "playing",
+    status: 'playing',
     previousGuesses: [validStartWord],
     currentGuess: validStartWord,
     selectedLetterIndex: null,
@@ -111,7 +111,7 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
           setGameState(parsedState);
         }
       } catch (error) {
-        console.error("Failed to load game state:", error);
+        console.error('Failed to load game state:', error);
       } finally {
         setLoading(false);
       }
@@ -126,12 +126,9 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
       if (loading) return; // Don't save while loading
 
       try {
-        await AsyncStorage.setItem(
-          `ladders_${gameId}`,
-          JSON.stringify(gameState)
-        );
+        await AsyncStorage.setItem(`ladders_${gameId}`, JSON.stringify(gameState));
       } catch (error) {
-        console.error("Failed to save game state:", error);
+        console.error('Failed to save game state:', error);
       }
     };
 
@@ -140,13 +137,10 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
 
   // Handle win condition
   useEffect(() => {
-    if (
-      gameState.currentGuess === validGoalWord &&
-      gameState.status === "playing"
-    ) {
-      setGameState((prev) => ({
+    if (gameState.currentGuess === validGoalWord && gameState.status === 'playing') {
+      setGameState(prev => ({
         ...prev,
-        status: "won",
+        status: 'won',
         completedTimestamp: Date.now(),
       }));
 
@@ -182,9 +176,9 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
 
   // Select a letter position
   const selectLetterPosition = (index: number) => {
-    if (gameState.status !== "playing") return;
+    if (gameState.status !== 'playing') return;
 
-    setGameState((prev) => ({
+    setGameState(prev => ({
       ...prev,
       selectedLetterIndex: prev.selectedLetterIndex === index ? null : index,
     }));
@@ -192,18 +186,14 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
 
   // Handle letter key press
   const handleLetterPress = (letter: string) => {
-    if (
-      gameState.status !== "playing" ||
-      gameState.selectedLetterIndex === null
-    )
-      return;
+    if (gameState.status !== 'playing' || gameState.selectedLetterIndex === null) return;
 
     const newGuess =
       gameState.currentGuess.substring(0, gameState.selectedLetterIndex) +
       letter +
       gameState.currentGuess.substring(gameState.selectedLetterIndex + 1);
 
-    setGameState((prev) => ({
+    setGameState(prev => ({
       ...prev,
       currentGuess: newGuess,
     }));
@@ -212,16 +202,14 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
   // Check if the current guess is valid
   const isValidGuess = () => {
     if (
-      gameState.currentGuess ===
-      gameState.previousGuesses[gameState.previousGuesses.length - 1]
+      gameState.currentGuess === gameState.previousGuesses[gameState.previousGuesses.length - 1]
     ) {
       return false; // No change from previous guess
     }
 
     // Check if only one letter has changed
     let differentLetters = 0;
-    const prevWord =
-      gameState.previousGuesses[gameState.previousGuesses.length - 1];
+    const prevWord = gameState.previousGuesses[gameState.previousGuesses.length - 1];
     for (let i = 0; i < 4; i++) {
       if (gameState.currentGuess[i] !== prevWord[i]) {
         differentLetters++;
@@ -238,11 +226,10 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
 
   // Submit the current guess
   const submitGuess = () => {
-    if (gameState.status !== "playing" || !isValidGuess()) return;
+    if (gameState.status !== 'playing' || !isValidGuess()) return;
 
     // Find which letter changed
-    const prevWord =
-      gameState.previousGuesses[gameState.previousGuesses.length - 1];
+    const prevWord = gameState.previousGuesses[gameState.previousGuesses.length - 1];
     let changedIndex = 0;
     for (let i = 0; i < 4; i++) {
       if (gameState.currentGuess[i] !== prevWord[i]) {
@@ -251,7 +238,7 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
       }
     }
 
-    setGameState((prev) => {
+    setGameState(prev => {
       const updatedChangedIndices = { ...prev.changedLetterIndices };
       updatedChangedIndices[prev.currentGuess] = changedIndex;
 
@@ -293,8 +280,7 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
         key={`${word}-tile-${index}`}
         style={tileStyle}
         onPress={() => isActive && selectLetterPosition(index)}
-        disabled={!isActive}
-      >
+        disabled={!isActive}>
         <Text style={textStyle}>{letter.toUpperCase()}</Text>
       </TouchableOpacity>
     );
@@ -308,14 +294,9 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
     isWinning: boolean
   ) => {
     return (
-      <View
-        style={[
-          styles.wordRow,
-          isActive ? styles.activeRow : styles.inactiveRow,
-        ]}
-      >
+      <View style={[styles.wordRow, isActive ? styles.activeRow : styles.inactiveRow]}>
         {word
-          .split("")
+          .split('')
           .map((letter, index) =>
             renderLetterTile(
               letter,
@@ -323,7 +304,7 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
               word,
               isActive,
               isActive && gameState.selectedLetterIndex === index,
-              isWinning && gameState.status === "won",
+              isWinning && gameState.status === 'won',
               !isActive && gameState.changedLetterIndices[word] === index
             )
           )}
@@ -337,20 +318,15 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
       <View style={styles.keyboard}>
         {KEYBOARD_ROWS.map((row, rowIndex) => (
           <View key={`row-${rowIndex}`} style={styles.keyboardRow}>
-            {row.map((key) => (
+            {row.map(key => (
               <TouchableOpacity
                 key={`key-${key}`}
                 style={[
                   styles.keyTile,
-                  gameState.selectedLetterIndex === null &&
-                    styles.disabledKeyTile,
+                  gameState.selectedLetterIndex === null && styles.disabledKeyTile,
                 ]}
                 onPress={() => handleLetterPress(key)}
-                disabled={
-                  gameState.selectedLetterIndex === null ||
-                  gameState.status !== "playing"
-                }
-              >
+                disabled={gameState.selectedLetterIndex === null || gameState.status !== 'playing'}>
                 <Text style={styles.keyText}>{key.toUpperCase()}</Text>
               </TouchableOpacity>
             ))}
@@ -378,70 +354,49 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
         <View style={styles.gameArea}>
           <View style={styles.fixedBottomArea}>
             {/* Goal word */}
-            {renderWordRow(
-              validGoalWord,
-              false,
-              true,
-              gameState.status === "won"
-            )}
+            {renderWordRow(validGoalWord, false, true, gameState.status === 'won')}
             {/* Current active guess */}
             {renderWordRow(
               gameState.currentGuess,
               true,
               false,
-              gameState.status === "won" &&
-                gameState.currentGuess === validGoalWord
+              gameState.status === 'won' && gameState.currentGuess === validGoalWord
             )}
           </View>
           <ScrollView
             style={styles.scrollArea}
             contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-          >
+            showsVerticalScrollIndicator={false}>
             {/* Previous guesses - in reverse order (newest at the bottom) */}
             {gameState.previousGuesses
               .slice(0, -1)
               .map((guess, index) => (
-                <View key={`previous-${index}`}>
-                  {renderWordRow(guess, false, false, false)}
-                </View>
+                <View key={`previous-${index}`}>{renderWordRow(guess, false, false, false)}</View>
               ))
               .reverse()}
           </ScrollView>
           {/* Confirm button */}
-          {gameState.status === "playing" && (
+          {gameState.status === 'playing' && (
             <View
               style={{
-                flexDirection: "row",
+                flexDirection: 'row',
                 gap: 6,
-                width: 376,
-                justifyContent: "center",
-              }}
-            >
+                width: '100%',
+                justifyContent: 'center',
+              }}>
               <TouchableOpacity
-                style={[
-                  styles.confirmButton,
-                  !isConfirmEnabled && styles.disabledButton,
-                ]}
+                style={[styles.confirmButton, !isConfirmEnabled && styles.disabledButton]}
                 onPress={submitGuess}
-                disabled={!isConfirmEnabled}
-              >
-                <Text
-                  style={[
-                    styles.confirmText,
-                    !isConfirmEnabled && styles.disabledButtonText,
-                  ]}
-                >
-                  Confirm
-                </Text>
+                disabled={!isConfirmEnabled}>
+                <Text style={[styles.confirmText]}>Confirm</Text>
               </TouchableOpacity>
               {/* Button to add a new word to the valid word list */}
               <TouchableOpacity
-                style={[styles.confirmAltButton]}
+                style={[styles.confirmAltButton, isConfirmEnabled && styles.altDisabledButton]}
                 onPress={() => {
-                  console.log("Add Word");
+                  console.log('Add Word');
                 }}
-              >
+                disabled={isConfirmEnabled}>
                 <Text style={[styles.confirmAltText]}>☝️🤓</Text>
               </TouchableOpacity>
             </View>
@@ -449,7 +404,7 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
         </View>
 
         {/* Keyboard */}
-        {gameState.status === "playing" && renderKeyboard()}
+        {gameState.status === 'playing' && renderKeyboard()}
       </View>
     </View>
   );
@@ -458,53 +413,53 @@ const LaddersGame: React.FC<LaddersGameProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "flex-start",
-    backgroundColor: "#FFFFFF",
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
     paddingTop: 20,
   },
   loadingContainer: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   gameTitle: {
-    color: "#000000",
-    textAlign: "center",
+    color: '#000000',
+    textAlign: 'center',
     fontSize: 24,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 20,
   },
   gameContainer: {
     flex: 1,
-    width: "100%",
+    width: '100%',
     gap: 12,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   gameArea: {
-    width: "100%",
+    width: '100%',
     maxWidth: 350,
-    alignItems: "center",
-    alignSelf: "center",
+    alignItems: 'center',
+    alignSelf: 'center',
     flex: 1,
   },
   scrollArea: {
-    width: "100%",
+    width: '100%',
     flex: 1,
   },
   scrollContent: {
-    alignItems: "center",
+    alignItems: 'center',
     gap: 4,
   },
   fixedBottomArea: {
-    width: "100%",
-    alignItems: "center",
+    width: '100%',
+    alignItems: 'center',
     gap: 8,
   },
   wordRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     marginBottom: 8,
   },
@@ -518,113 +473,126 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     padding: 6,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     aspectRatio: 1,
     borderRadius: 6,
-    backgroundColor: "rgba(211, 214, 219, 1)",
+    backgroundColor: 'rgba(211, 214, 219, 1)',
   },
   activeTile: {
-    backgroundColor: "rgba(211, 214, 219, 1)",
+    backgroundColor: 'rgba(211, 214, 219, 1)',
   },
   selectedTile: {
-    backgroundColor: "rgba(79, 133, 229, 1)",
+    backgroundColor: 'rgba(79, 133, 229, 1)',
   },
   changedLetterTile: {
-    backgroundColor: "rgba(167, 216, 255, 1)", // Light blue for changed letters
+    backgroundColor: 'rgba(167, 216, 255, 1)', // Light blue for changed letters
   },
   winningTile: {
-    backgroundColor: "#4CAF50", // Green for winning tiles
+    backgroundColor: '#4CAF50', // Green for winning tiles
   },
   letterText: {
     fontSize: 40,
-    fontWeight: "600",
-    color: "#000000",
-    textAlign: "center",
+    fontWeight: '600',
+    color: '#000000',
+    textAlign: 'center',
   },
   selectedLetterText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
   },
   winningLetterText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
   },
   keyboard: {
-    width: "100%",
+    width: '100%',
     paddingHorizontal: 2,
-    paddingBottom: 20,
+    paddingBottom: 30,
   },
   keyboardRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 6,
     marginBottom: 6,
   },
   keyTile: {
     width: 32,
     height: 59,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 5,
-    backgroundColor: "rgba(211, 214, 219, 1)",
+    backgroundColor: 'rgba(211, 214, 219, 1)',
   },
   disabledKeyTile: {
     opacity: 0.5,
   },
   keyText: {
     fontSize: 22,
-    fontWeight: "500",
-    color: "#000000",
-    textTransform: "capitalize",
+    fontWeight: '500',
+    color: '#000000',
+    textTransform: 'capitalize',
   },
   confirmButton: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingVertical: 14,
-    width: "78%",
-    justifyContent: "center",
+    width: '85%',
+    justifyContent: 'center',
     paddingHorizontal: 12,
     borderRadius: 6,
-    backgroundColor: "rgba(79, 133, 229, 1)",
+    backgroundColor: 'rgba(79, 133, 229, 1)',
     marginTop: 10,
   },
   confirmAltButton: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingVertical: 14,
-    justifyContent: "center",
+    width: '20%',
+    justifyContent: 'center',
     paddingHorizontal: 12,
     borderRadius: 6,
-    backgroundColor: "#F788B0",
+    backgroundColor: '#F788B0',
+    marginTop: 10,
+  },
+  altDisabledButton: {
+    flexDirection: 'row',
+    paddingVertical: 14,
+    width: '20%',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: 'rgba(139, 139, 139, 1)',
     marginTop: 10,
   },
   disabledButton: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "rgba(139, 139, 139, 1)",
+    flexDirection: 'row',
+    paddingVertical: 14,
+    width: '85%',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: 'rgba(139, 139, 139, 1)',
+    marginTop: 10,
   },
   confirmText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: "500",
-    textTransform: "capitalize",
+    fontWeight: '500',
+    textTransform: 'capitalize',
   },
   confirmAltText: {
-    color: "#4F85E5",
+    color: '#4F85E5',
     fontSize: 16,
-    fontWeight: "500",
-    textTransform: "capitalize",
-  },
-  disabledButtonText: {
-    color: "rgba(139, 139, 139, 1)",
+    fontWeight: '500',
+    textTransform: 'capitalize',
   },
   winnerContainer: {
     marginTop: 20,
-    alignItems: "center",
+    alignItems: 'center',
   },
   winnerText: {
     fontSize: 24,
-    fontWeight: "700",
-    color: "#4CAF50",
-    textAlign: "center",
+    fontWeight: '700',
+    color: '#4CAF50',
+    textAlign: 'center',
   },
 });
 
