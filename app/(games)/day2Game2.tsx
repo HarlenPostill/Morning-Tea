@@ -8,12 +8,7 @@ import LaddersGame from '@/components/games/LaddersGame';
 export default function Day2Game2() {
   return (
     <ThemedView style={styles.container}>
-      <LaddersGame
-        gameId={'day2game2'}
-        title="Harlen's Ladders 🗣️"
-        startWord={'reel'}
-        goalWord={'slat'}
-      />
+      <LaddersGame gameId={'day2game2'} title="Book to Page" startWord={'book'} goalWord={'page'} />
     </ThemedView>
   );
 }

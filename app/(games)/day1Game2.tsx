@@ -8,7 +8,7 @@ export default function Day1Game2() {
     <>
       <ThemedView style={styles.container}>
         <CustomWordle
-          dailyWord="yoyo"
+          dailyWord="love"
           gameId="day1game2"
           maxAttempts={6}
           onGameEnd={won => console.log(won ? 'Game won!' : 'Game lost!')}
