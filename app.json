@@ -8,7 +8,7 @@
     "splash": {
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F9B8BA"
+      "backgroundColor": "#FFBBBC"
     },
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
@@ -20,7 +20,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#F9B8BA"
+        "backgroundColor": "##FFBBBC"
       },
       "package": "com.anonymous.MorningTea"
     },
@@ -37,7 +37,7 @@
           "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#F9B8BA"
+          "backgroundColor": "#FFBBBC"
         }
       ]
     ],

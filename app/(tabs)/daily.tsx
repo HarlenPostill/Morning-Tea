@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { StyleSheet, Button } from 'react-native';
+import { StyleSheet, Button, Image, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -10,38 +10,53 @@ import { Picker } from '@react-native-picker/picker';
 
 import React, { useState } from 'react';
 import { AsyncStorageViewer } from '@/components/AsyncStorageViewer';
+import { MiffyText } from '@/components/MiffyText';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 export default function TabTwoScreen() {
   const [day, setDay] = useState(1);
   return (
-    <AlternateScrollView
-      headerBackgroundColor={{ light: Colors.light.background, dark: Colors.dark.background }}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Daily Gauntlet</ThemedText>
-      </ThemedView>
-      <ThemedText>Try out today's daily gauntlet!</ThemedText>
+    <AlternateScrollView>
+      <MiffyText text="The Daily" color={Colors.miffySeconday} size={45} />
+      <MiffyText text="Completed 0/3" color={Colors.miffyAccent} isItalic size={24} />
+
+      <TouchableOpacity
+        style={[
+          styles.mediaButton,
+          { backgroundColor: Colors.miffyPrimary, borderColor: '#F9D4DB' },
+        ]}
+        onPress={() => router.push(`/(games)/day${day}Game1`)}>
+        <MiffyText text="Game 1" size={30} color="#fff" />
+        <IconSymbol name="checkmark.circle.fill" color={'white'} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          styles.mediaButton,
+          { backgroundColor: Colors.miffyAccent, borderColor: '#BDCBF2' },
+        ]}
+        onPress={() => router.push(`/(games)/day${day}Game2`)}>
+        <MiffyText text="Game 2" size={30} color="#fff" />
+        <IconSymbol name="checkmark.circle.fill" color={'white'} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          styles.mediaButton,
+          { backgroundColor: Colors.miffySeconday, borderColor: '#EAB2BA' },
+        ]}
+        onPress={() => router.push(`/(games)/day${day}Game3`)}>
+        <MiffyText text="Game 3" size={30} color="#fff" />
+        <IconSymbol name="checkmark.circle.fill" color={'white'} />
+      </TouchableOpacity>
+
       <Picker selectedValue={day} onValueChange={itemValue => setDay(itemValue)}>
         {[...Array(30)].map((_, index) => (
           <Picker.Item key={index + 1} label={`Day ${index + 1}`} value={index + 1} />
         ))}
       </Picker>
 
-      <Button
-        title="First Game"
-        onPress={() => router.push(`/(games)/day${day}Game1`)}
-        color={Colors.light.tint}
-      />
-      <Button
-        title="Second Game"
-        onPress={() => router.push(`/(games)/day${day}Game2`)}
-        color={Colors.light.tint}
-      />
-      <Button
-        title="Third Game"
-        onPress={() => router.push(`/(games)/day${day}Game3`)}
-        color={Colors.light.tint}
-      />
-      <AsyncStorageViewer />
+      <Image style={styles.jasmine} source={require('@assets/jasmine-min.png')} />
     </AlternateScrollView>
   );
 }
@@ -56,5 +71,19 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  jasmine: {
+    position: 'absolute',
+    bottom: -100,
+    left: -35,
+  },
+  mediaButton: {
+    width: '100%',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });

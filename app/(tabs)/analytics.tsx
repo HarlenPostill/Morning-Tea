@@ -6,6 +6,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { AsyncStorageViewer } from '@/components/AsyncStorageViewer';
 
 export default function TabTwoScreen() {
   return (
@@ -89,6 +90,7 @@ export default function TabTwoScreen() {
           ),
         })}
       </Collapsible>
+      <AsyncStorageViewer />
     </ParallaxScrollView>
   );
 }
