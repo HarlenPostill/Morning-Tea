@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,11 @@ import {
   Dimensions,
   Animated,
   Vibration,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { router } from 'expo-router';
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 
-// Types
-type LetterState = 'correct' | 'present' | 'absent' | 'empty';
+type LetterState = "correct" | "present" | "absent" | "empty";
 
 interface GuessRow {
   letters: {
@@ -24,7 +23,7 @@ interface GuessRow {
 interface GameState {
   guesses: GuessRow[];
   currentGuess: string;
-  gameStatus: 'playing' | 'won' | 'lost';
+  gameStatus: "playing" | "won" | "lost";
   keyboardStatus: Record<string, LetterState>;
   completed: boolean;
 }
@@ -38,18 +37,18 @@ interface CustomWordleProps {
 }
 
 const KEYBOARD_ROWS = [
-  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-  ['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
+  ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+  ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+  ["Enter", "Z", "X", "C", "V", "B", "N", "M", "⌫"],
 ];
 
-const CustomWordle: React.FC<CustomWordleProps> = ({
+const CustomWordle = ({
   dailyWord,
   gameId,
   maxAttempts = 6,
   onGameEnd,
   darkMode = false,
-}) => {
+}: CustomWordleProps) => {
   const wordLength = dailyWord.length;
   const [gameState, setGameState] = useState<GameState>({
     guesses: Array(maxAttempts)
@@ -57,10 +56,10 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
       .map(() => ({
         letters: Array(wordLength)
           .fill(null)
-          .map(() => ({ value: '', state: 'empty' })),
+          .map(() => ({ value: "", state: "empty" })),
       })),
-    currentGuess: '',
-    gameStatus: 'playing',
+    currentGuess: "",
+    gameStatus: "playing",
     keyboardStatus: {},
     completed: false,
   });
@@ -69,21 +68,22 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
   const [showCompletionMessage, setShowCompletionMessage] = useState(false);
   const shakingRow = useRef(new Animated.Value(0)).current;
 
-  // Load saved game state
   useEffect(() => {
     loadGameState();
   }, [gameId]);
 
-  // Save game state when it changes
   useEffect(() => {
-    if (gameState.gameStatus !== 'playing' || gameState.completed) {
+    if (gameState.gameStatus !== "playing" || gameState.completed) {
       saveGameState();
 
-      if (onGameEnd && (gameState.gameStatus === 'won' || gameState.gameStatus === 'lost')) {
-        onGameEnd(gameState.gameStatus === 'won');
+      if (
+        onGameEnd &&
+        (gameState.gameStatus === "won" || gameState.gameStatus === "lost")
+      ) {
+        onGameEnd(gameState.gameStatus === "won");
       }
 
-      if (gameState.gameStatus !== 'playing' && !showCompletionMessage) {
+      if (gameState.gameStatus !== "playing" && !showCompletionMessage) {
         setTimeout(() => {
           setShowCompletionMessage(true);
         }, 1000);
@@ -91,15 +91,34 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
     }
   }, [gameState.gameStatus, gameState.completed]);
 
-  // Handle shake animation
   useEffect(() => {
     if (shake) {
       Animated.sequence([
-        Animated.timing(shakingRow, { toValue: 10, duration: 50, useNativeDriver: true }),
-        Animated.timing(shakingRow, { toValue: -10, duration: 50, useNativeDriver: true }),
-        Animated.timing(shakingRow, { toValue: 10, duration: 50, useNativeDriver: true }),
-        Animated.timing(shakingRow, { toValue: -10, duration: 50, useNativeDriver: true }),
-        Animated.timing(shakingRow, { toValue: 0, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakingRow, {
+          toValue: 10,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakingRow, {
+          toValue: -10,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakingRow, {
+          toValue: 10,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakingRow, {
+          toValue: -10,
+          duration: 50,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shakingRow, {
+          toValue: 0,
+          duration: 50,
+          useNativeDriver: true,
+        }),
       ]).start(() => setShake(false));
     }
   }, [shake]);
@@ -111,21 +130,22 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
         const parsedState = JSON.parse(savedState);
         setGameState(parsedState);
 
-        // Find the current attempt
         const lastFilledRow = parsedState.guesses.findIndex((guess: GuessRow) =>
-          guess.letters.some((letter: any) => letter.value === '')
+          guess.letters.some((letter: any) => letter.value === "")
         );
 
-        setCurrentAttempt(lastFilledRow === -1 ? parsedState.guesses.length : lastFilledRow);
+        setCurrentAttempt(
+          lastFilledRow === -1 ? parsedState.guesses.length : lastFilledRow
+        );
 
-        if (parsedState.gameStatus !== 'playing') {
+        if (parsedState.gameStatus !== "playing") {
           setTimeout(() => {
             setShowCompletionMessage(true);
           }, 500);
         }
       }
     } catch (error) {
-      console.error('Failed to load game state:', error);
+      console.error("Failed to load game state:", error);
     }
   };
 
@@ -133,22 +153,22 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
     try {
       await AsyncStorage.setItem(`wordle_${gameId}`, JSON.stringify(gameState));
     } catch (error) {
-      console.error('Failed to save game state:', error);
+      console.error("Failed to save game state:", error);
     }
   };
 
   const handleKeyPress = (key: string) => {
-    if (gameState.gameStatus !== 'playing') return;
+    if (gameState.gameStatus !== "playing") return;
 
-    if (key === '⌫') {
-      setGameState(prev => ({
+    if (key === "⌫") {
+      setGameState((prev) => ({
         ...prev,
         currentGuess: prev.currentGuess.slice(0, -1),
       }));
-    } else if (key === 'Enter') {
+    } else if (key === "Enter") {
       submitGuess();
     } else if (gameState.currentGuess.length < wordLength) {
-      setGameState(prev => ({
+      setGameState((prev) => ({
         ...prev,
         currentGuess: prev.currentGuess + key.toLowerCase(),
       }));
@@ -156,25 +176,23 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
   };
 
   const evaluateGuess = (guess: string): LetterState[] => {
-    const result: LetterState[] = Array(wordLength).fill('absent');
-    const dailyWordArray = dailyWord.toLowerCase().split('');
-    const guessArray = guess.toLowerCase().split('');
+    const result: LetterState[] = Array(wordLength).fill("absent");
+    const dailyWordArray = dailyWord.toLowerCase().split("");
+    const guessArray = guess.toLowerCase().split("");
 
-    // First pass: mark correct letters
     guessArray.forEach((letter, i) => {
       if (letter === dailyWordArray[i]) {
-        result[i] = 'correct';
-        dailyWordArray[i] = '#'; // Mark as used
+        result[i] = "correct";
+        dailyWordArray[i] = "#";
       }
     });
 
-    // Second pass: mark present letters
     guessArray.forEach((letter, i) => {
-      if (result[i] !== 'correct') {
+      if (result[i] !== "correct") {
         const index = dailyWordArray.indexOf(letter);
         if (index !== -1) {
-          result[i] = 'present';
-          dailyWordArray[index] = '#'; // Mark as used
+          result[i] = "present";
+          dailyWordArray[index] = "#";
         }
       }
     });
@@ -189,51 +207,48 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
       return;
     }
 
-    // You could implement a dictionary check here
-    // For simplicity, we're allowing any word
+    // TODO implement a dictionary check here
 
     const evaluation = evaluateGuess(gameState.currentGuess);
 
-    // Update keyboard status
     const newKeyboardStatus = { ...gameState.keyboardStatus };
-    gameState.currentGuess.split('').forEach((letter, index) => {
+    gameState.currentGuess.split("").forEach((letter, index) => {
       const currentStatus = newKeyboardStatus[letter.toUpperCase()];
       const newStatus = evaluation[index];
 
-      // Only override if the new status has higher priority
       if (
         !currentStatus ||
-        currentStatus === 'absent' ||
-        (currentStatus === 'present' && newStatus === 'correct')
+        currentStatus === "absent" ||
+        (currentStatus === "present" && newStatus === "correct")
       ) {
         newKeyboardStatus[letter.toUpperCase()] = newStatus;
       }
     });
 
-    // Update game state
-    setGameState(prev => {
+    setGameState((prev) => {
       const newGuesses = [...prev.guesses];
       newGuesses[currentAttempt] = {
-        letters: gameState.currentGuess.split('').map((letter, index) => ({
+        letters: gameState.currentGuess.split("").map((letter, index) => ({
           value: letter,
           state: evaluation[index],
         })),
       };
 
-      const won = gameState.currentGuess.toLowerCase() === dailyWord.toLowerCase();
+      const won =
+        gameState.currentGuess.toLowerCase() === dailyWord.toLowerCase();
       const lost = !won && currentAttempt >= maxAttempts - 1;
 
       return {
         ...prev,
         guesses: newGuesses,
-        currentGuess: '',
-        gameStatus: won ? 'won' : lost ? 'lost' : 'playing',
+        currentGuess: "",
+        gameStatus: won ? "won" : lost ? "lost" : "playing",
         keyboardStatus: newKeyboardStatus,
         completed: won || lost,
       };
     });
 
-    setCurrentAttempt(prev => prev + 1);
+    setCurrentAttempt((prev) => prev + 1);
   };
 
   const resetGame = () => {
@@ -243,10 +258,10 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
         .map(() => ({
           letters: Array(wordLength)
             .fill(null)
-            .map(() => ({ value: '', state: 'empty' })),
+            .map(() => ({ value: "", state: "empty" })),
         })),
-      currentGuess: '',
-      gameStatus: 'playing',
+      currentGuess: "",
+      gameStatus: "playing",
       keyboardStatus: {},
       completed: false,
     });
@@ -265,17 +280,20 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
               rowIndex === currentAttempt && shake
                 ? { transform: [{ translateX: shakingRow }] }
                 : {},
-            ]}>
+            ]}
+          >
             {row.letters.map((letter, letterIndex) => {
-              // For current row that hasn't been submitted yet, show the current guess
               const displayLetter =
-                rowIndex === currentAttempt && gameState.gameStatus === 'playing'
-                  ? gameState.currentGuess[letterIndex] || ''
+                rowIndex === currentAttempt &&
+                gameState.gameStatus === "playing"
+                  ? gameState.currentGuess[letterIndex] || ""
                   : letter.value;
 
               const letterState =
-                rowIndex === currentAttempt && gameState.gameStatus === 'playing' && displayLetter
-                  ? 'empty' // Current typing row
+                rowIndex === currentAttempt &&
+                gameState.gameStatus === "playing" &&
+                displayLetter
+                  ? "empty"
                   : letter.state;
 
               return (
@@ -286,19 +304,31 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
                     {
                       borderColor: displayLetter
                         ? darkMode
-                          ? '#565758'
-                          : '#d3d6da'
+                          ? "#565758"
+                          : "#d3d6da"
                         : darkMode
-                        ? '#3a3a3c'
-                        : '#d3d6da',
-                      backgroundColor: getBackgroundColor(letterState, darkMode),
+                        ? "#3a3a3c"
+                        : "#d3d6da",
+                      backgroundColor: getBackgroundColor(
+                        letterState,
+                        darkMode
+                      ),
                     },
-                  ]}>
+                  ]}
+                >
                   <Text
                     style={[
                       styles.tileText,
-                      { color: letterState === 'empty' ? (darkMode ? 'white' : 'black') : 'white' },
-                    ]}>
+                      {
+                        color:
+                          letterState === "empty"
+                            ? darkMode
+                              ? "white"
+                              : "black"
+                            : "white",
+                      },
+                    ]}
+                  >
                     {displayLetter.toUpperCase()}
                   </Text>
                 </View>
@@ -315,22 +345,36 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
       <View style={styles.keyboardContainer}>
         {KEYBOARD_ROWS.map((row, rowIndex) => (
           <View key={rowIndex} style={styles.keyboardRow}>
-            {row.map(key => {
-              const keyState = gameState.keyboardStatus[key] || 'empty';
+            {row.map((key) => {
+              const keyState = gameState.keyboardStatus[key] || "empty";
               return (
                 <TouchableOpacity
                   key={key}
                   style={[
                     styles.key,
-                    key === 'Enter' || key === '⌫' ? styles.wideKey : {},
-                    { backgroundColor: getKeyBackgroundColor(keyState, darkMode) },
+                    key === "Enter" || key === "⌫" ? styles.wideKey : {},
+                    {
+                      backgroundColor: getKeyBackgroundColor(
+                        keyState,
+                        darkMode
+                      ),
+                    },
                   ]}
-                  onPress={() => handleKeyPress(key)}>
+                  onPress={() => handleKeyPress(key)}
+                >
                   <Text
                     style={[
                       styles.keyText,
-                      { color: keyState === 'empty' ? (darkMode ? 'white' : 'black') : 'white' },
-                    ]}>
+                      {
+                        color:
+                          keyState === "empty"
+                            ? darkMode
+                              ? "white"
+                              : "black"
+                            : "white",
+                      },
+                    ]}
+                  >
                     {key}
                   </Text>
                 </TouchableOpacity>
@@ -346,16 +390,30 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
     if (!showCompletionMessage) return null;
 
     return (
-      <View style={[styles.completionContainer, darkMode ? { backgroundColor: '#121213' } : {}]}>
-        <Text style={[styles.completionTitle, darkMode ? { color: 'white' } : {}]}>
-          {gameState.gameStatus === 'won' ? 'Congratulations!' : 'Game Over'}
+      <View
+        style={[
+          styles.completionContainer,
+          darkMode ? { backgroundColor: "#121213" } : {},
+        ]}
+      >
+        <Text
+          style={[styles.completionTitle, darkMode ? { color: "white" } : {}]}
+        >
+          {gameState.gameStatus === "won" ? "Congratulations!" : "Game Over"}
         </Text>
-        <Text style={[styles.completionMessage, darkMode ? { color: 'white' } : {}]}>
-          {gameState.gameStatus === 'won'
-            ? `You guessed the word in ${currentAttempt} ${currentAttempt === 1 ? 'try' : 'tries'}!`
+        <Text
+          style={[styles.completionMessage, darkMode ? { color: "white" } : {}]}
+        >
+          {gameState.gameStatus === "won"
+            ? `You guessed the word in ${currentAttempt} ${
+                currentAttempt === 1 ? "try" : "tries"
+              }!`
             : `The word was ${dailyWord.toUpperCase()}`}
         </Text>
-        <TouchableOpacity style={styles.resetButton} onPress={() => router.back()}>
+        <TouchableOpacity
+          style={styles.resetButton}
+          onPress={() => router.back()}
+        >
           <Text style={styles.resetButtonText}>Back Home</Text>
         </TouchableOpacity>
       </View>
@@ -363,7 +421,9 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
   };
 
   return (
-    <View style={[styles.container, darkMode ? { backgroundColor: '#121213' } : {}]}>
+    <View
+      style={[styles.container, darkMode ? { backgroundColor: "#121213" } : {}]}
+    >
       <View style={styles.gameContainer}>
         {renderGameBoard()}
         {renderKeyboard()}
@@ -373,59 +433,61 @@ const CustomWordle: React.FC<CustomWordleProps> = ({
   );
 };
 
-// Helper functions
 const getBackgroundColor = (state: LetterState, darkMode: boolean): string => {
   switch (state) {
-    case 'correct':
-      return '#6aaa64';
-    case 'present':
-      return '#c9b458';
-    case 'absent':
-      return darkMode ? '#3a3a3c' : '#787c7e';
+    case "correct":
+      return "#6aaa64";
+    case "present":
+      return "#c9b458";
+    case "absent":
+      return darkMode ? "#3a3a3c" : "#787c7e";
     default:
-      return 'transparent';
+      return "transparent";
   }
 };
 
-const getKeyBackgroundColor = (state: LetterState, darkMode: boolean): string => {
+const getKeyBackgroundColor = (
+  state: LetterState,
+  darkMode: boolean
+): string => {
   switch (state) {
-    case 'correct':
-      return '#6aaa64';
-    case 'present':
-      return '#c9b458';
-    case 'absent':
-      return darkMode ? '#3a3a3c' : '#787c7e';
+    case "correct":
+      return "#6aaa64";
+    case "present":
+      return "#c9b458";
+    case "absent":
+      return darkMode ? "#3a3a3c" : "#787c7e";
     default:
-      return darkMode ? '#818384' : '#d3d6da';
+      return darkMode ? "#818384" : "#d3d6da";
   }
 };
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const tileSize = Math.min(width / 8, 58);
 const tileMargin = 4;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    backgroundColor: "#fff",
+    justifyContent: "space-between",
     padding: 10,
   },
   gameContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
     maxWidth: 500,
   },
   boardContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 20,
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 4,
   },
   tile: {
@@ -433,36 +495,36 @@ const styles = StyleSheet.create({
     height: tileSize,
     borderWidth: 2,
     borderRadius: 4,
-    borderColor: '#d3d6da',
+    borderColor: "#d3d6da",
     margin: tileMargin,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   tileText: {
     fontSize: tileSize * 0.55,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+    fontWeight: "bold",
+    textTransform: "uppercase",
   },
   keyboardContainer: {
     marginTop: 20,
     marginBottom: 30,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   keyboardRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 8,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   key: {
     height: 58,
     minWidth: 30,
     paddingHorizontal: 10,
     borderRadius: 4,
-    backgroundColor: '#d3d6da',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#d3d6da",
+    alignItems: "center",
+    justifyContent: "center",
     margin: 3,
   },
   wideKey: {
@@ -470,19 +532,19 @@ const styles = StyleSheet.create({
   },
   keyText: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   completionContainer: {
-    position: 'absolute',
-    top: '30%',
-    left: '10%',
-    right: '10%',
-    backgroundColor: 'white',
+    position: "absolute",
+    top: "30%",
+    left: "10%",
+    right: "10%",
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -490,24 +552,24 @@ const styles = StyleSheet.create({
   },
   completionTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   completionMessage: {
     fontSize: 16,
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   resetButton: {
-    backgroundColor: '#6aaa64',
+    backgroundColor: "#6aaa64",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 4,
   },
   resetButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

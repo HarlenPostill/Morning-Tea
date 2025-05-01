@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,11 +8,11 @@ import {
   Platform,
   Alert,
   KeyboardAvoidingView,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { IconSymbol } from '../ui/IconSymbol';
+  Share,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IconSymbol } from "../ui/IconSymbol";
 
-// Types and interfaces
 interface Cell {
   row: number;
   col: number;
@@ -34,27 +34,16 @@ interface Clue {
 }
 
 export interface CrosswordProps {
-  // Unique identifier for local storage
   gameId: string;
-  // Grid size (typically 5x5 for mini crossword)
   size?: number;
-  // The title of the puzzle (optional)
   title?: string;
-  // The puzzle creator's name (optional)
   author?: string;
-  // The difficulty level (optional)
-  difficulty?: 'easy' | 'medium' | 'hard';
-  // The date of the puzzle (optional)
+  difficulty?: "easy" | "medium" | "hard";
   date?: string;
-  // Clues for across
   acrossClues: Clue[];
-  // Clues for down
   downClues: Clue[];
-  // Callback when puzzle is completed
   onComplete?: (time: number) => void;
-  // Starting with revealed letters (optional)
   revealedLetters?: [number, number, string][];
-  // Theme colors (optional)
   theme?: {
     backgroundColor?: string;
     cellBackgroundColor?: string;
@@ -67,60 +56,51 @@ export interface CrosswordProps {
   };
 }
 
-// Default theme resembling NYT Mini Crossword
+// NYT mini constnants colours
 const defaultTheme = {
-  backgroundColor: '#ffffff',
-  cellBackgroundColor: '#ffffff',
-  cellSelectedColor: '#a7d8ff',
-  cellHighlightedColor: '#FCDA00', // New yellow highlight color
-  cellRevealedColor: '#ffeda3',
-  cellCorrectColor: '#dfffdf',
-  textColor: '#000000',
-  clueSelectedColor: '#e6f2ff',
+  backgroundColor: "#ffffff",
+  cellBackgroundColor: "#ffffff",
+  cellSelectedColor: "#a7d8ff",
+  cellHighlightedColor: "#FCDA00",
+  cellRevealedColor: "#ffeda3",
+  cellCorrectColor: "#dfffdf",
+  textColor: "#000000",
+  clueSelectedColor: "#e6f2ff",
 };
 
-export const MiniCrossword: React.FC<CrosswordProps> = ({
+export const MiniCrossword = ({
   gameId,
   size = 5,
-  title = 'Mini Crossword',
   author,
-  difficulty,
-  date,
+  title = "Mini Crossword",
   acrossClues,
   downClues,
   onComplete,
   revealedLetters = [],
   theme = defaultTheme,
-}) => {
-  // Merge provided theme with defaults
+}: CrosswordProps) => {
   const mergedTheme = { ...defaultTheme, ...theme };
 
-  // Grid state
   const [grid, setGrid] = useState<Cell[][]>([]);
 
-  // Current selection
   const [selectedCell, setSelectedCell] = useState<{
     row: number;
     col: number;
   } | null>(null);
-  const [direction, setDirection] = useState<'across' | 'down'>('across');
+  const [direction, setDirection] = useState<"across" | "down">("across");
   const [selectedClue, setSelectedClue] = useState<number | null>(null);
 
-  // Timer
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
 
-  // Refs
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize the grid
   useEffect(() => {
     initializeGrid();
     loadGameState();
 
-    // Start timer
     if (!startTime) {
       setStartTime(Date.now());
       startTimer();
@@ -136,7 +116,7 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
   const startTimer = () => {
     timerRef.current = setInterval(() => {
       if (!isPaused && !isCompleted) {
-        setElapsedTime(prev => prev + 1);
+        setElapsedTime((prev) => prev + 1);
       }
     }, 1000);
   };
@@ -145,12 +125,33 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     setIsPaused(true);
   };
 
-  const resumeTimer = () => {
-    setIsPaused(false);
+  const shareCurrentClue = async () => {
+    if (!selectedClue) {
+      Alert.alert("No clue selected", "Please select a clue to share.");
+      return;
+    }
+
+    const clueText = getClueText(selectedClue, direction);
+    const clueTitle = `${direction.toUpperCase()} ${selectedClue}`;
+    const shareMessage = `hey ${author}, I'm stuck on your crossword 😓 could I get a hint for ${clueTitle}: ${clueText}`;
+
+    try {
+      const result = await Share.share(
+        {
+          message: shareMessage,
+          title: `Share Crossword Clue`,
+        },
+        {
+          subject: `Crossword Clue: ${clueTitle}`,
+        }
+      );
+    } catch (error) {
+      console.error("Error sharing:", error);
+      Alert.alert("Error", "Could not share the clue");
+    }
   };
 
   const initializeGrid = () => {
-    // Create empty grid
     const newGrid: Cell[][] = Array(size)
       .fill(null)
       .map((_, r) =>
@@ -159,23 +160,21 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
           .map((_, c) => ({
             row: r,
             col: c,
-            letter: '',
+            letter: "",
             isAcross: false,
             isDown: false,
             isRevealed: false,
             isCorrect: false,
-            isFilled: false, // Start with all cells not filled
-            userInput: '',
+            isFilled: false,
+            userInput: "",
           }))
       );
 
-    // Mark cells that are part of clues
     for (const clue of acrossClues) {
       for (const [row, col] of clue.cells) {
         newGrid[row][col].isAcross = true;
-        newGrid[row][col].isFilled = true; // Mark cells part of clues as filled
+        newGrid[row][col].isFilled = true;
 
-        // Set clue number for the first cell in the clue
         if (row === clue.cells[0][0] && col === clue.cells[0][1]) {
           newGrid[row][col].clueNumber = clue.number;
         }
@@ -185,9 +184,8 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     for (const clue of downClues) {
       for (const [row, col] of clue.cells) {
         newGrid[row][col].isDown = true;
-        newGrid[row][col].isFilled = true; // Mark cells part of clues as filled
+        newGrid[row][col].isFilled = true;
 
-        // Set clue number for the first cell in the clue
         if (row === clue.cells[0][0] && col === clue.cells[0][1]) {
           if (!newGrid[row][col].clueNumber) {
             newGrid[row][col].clueNumber = clue.number;
@@ -196,7 +194,6 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
       }
     }
 
-    // Handle revealed letters if provided
     for (const [row, col, letter] of revealedLetters) {
       if (row >= 0 && row < size && col >= 0 && col < size) {
         newGrid[row][col].isRevealed = true;
@@ -207,11 +204,9 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
 
     setGrid(newGrid);
 
-    // Find the first fillable cell for initial selection
     let initialRow = 0;
     let initialCol = 0;
 
-    // Find first cell that's part of a clue
     outerLoop: for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
         if (newGrid[r][c].isFilled) {
@@ -223,7 +218,9 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     }
 
     setSelectedCell({ row: initialRow, col: initialCol });
-    setSelectedClue(getClueNumberFromCell(initialRow, initialCol, newGrid, 'across'));
+    setSelectedClue(
+      getClueNumberFromCell(initialRow, initialCol, newGrid, "across")
+    );
   };
 
   // Load saved game state from AsyncStorage
@@ -244,7 +241,7 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         }
       }
     } catch (error) {
-      console.error('Error loading game state:', error);
+      console.error("Error loading game state:", error);
     }
   };
 
@@ -259,13 +256,15 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         lastUpdated: Date.now(),
       };
 
-      await AsyncStorage.setItem(`crossword_${gameId}`, JSON.stringify(gameData));
+      await AsyncStorage.setItem(
+        `crossword_${gameId}`,
+        JSON.stringify(gameData)
+      );
     } catch (error) {
-      console.error('Error saving game state:', error);
+      console.error("Error saving game state:", error);
     }
   };
 
-  // Effect to save game state when grid changes
   useEffect(() => {
     if (grid.length > 0) {
       saveGameState();
@@ -273,16 +272,13 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     }
   }, [grid]);
 
-  // Check if the puzzle is completed
   const checkCompletion = () => {
     if (grid.length === 0) return;
 
-    // Check if all cells are filled correctly
     let isCorrect = true;
 
-    // Check all across clues
     for (const clue of acrossClues) {
-      let clueAnswer = '';
+      let clueAnswer = "";
       for (const [row, col] of clue.cells) {
         clueAnswer += grid[row][col].userInput.toUpperCase();
       }
@@ -293,10 +289,9 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
       }
     }
 
-    // If across clues are correct, check down clues
     if (isCorrect) {
       for (const clue of downClues) {
-        let clueAnswer = '';
+        let clueAnswer = "";
         for (const [row, col] of clue.cells) {
           clueAnswer += grid[row][col].userInput.toUpperCase();
         }
@@ -316,7 +311,10 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         onComplete(elapsedTime);
       }
 
-      Alert.alert('Congratulations!', `You completed the puzzle in ${formatTime(elapsedTime)}!`);
+      Alert.alert(
+        "Congratulations!",
+        `You completed the puzzle in ${formatTime(elapsedTime)}!`
+      );
 
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -324,83 +322,75 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     }
   };
 
-  // Get the clue number for a cell
   const getClueNumberFromCell = (
     row: number,
     col: number,
     gridData: Cell[][],
-    dir: 'across' | 'down'
+    dir: "across" | "down"
   ): number | null => {
     if (!gridData[row][col]) return null;
 
     const isAcross = gridData[row][col].isAcross;
     const isDown = gridData[row][col].isDown;
 
-    if (dir === 'across' && isAcross) {
-      // Find the start of the across clue
+    if (dir === "across" && isAcross) {
       let c = col;
       while (c > 0 && gridData[row][c - 1].isAcross) {
         c--;
       }
 
-      // Return the clue number of the first cell
       return gridData[row][c].clueNumber || null;
-    } else if (dir === 'down' && isDown) {
-      // Find the start of the down clue
+    } else if (dir === "down" && isDown) {
       let r = row;
       while (r > 0 && gridData[r - 1][col].isDown) {
         r--;
       }
 
-      // Return the clue number of the first cell
       return gridData[r][col].clueNumber || null;
     }
 
     return null;
   };
 
-  // Get the clue text from the clue number
-  const getClueText = (clueNumber: number | null, dir: 'across' | 'down'): string => {
-    if (!clueNumber) return '';
+  const getClueText = (
+    clueNumber: number | null,
+    dir: "across" | "down"
+  ): string => {
+    if (!clueNumber) return "";
 
-    const clues = dir === 'across' ? acrossClues : downClues;
-    const clue = clues.find(c => c.number === clueNumber);
+    const clues = dir === "across" ? acrossClues : downClues;
+    const clue = clues.find((c) => c.number === clueNumber);
 
-    return clue ? clue.text : '';
+    return clue ? clue.text : "";
   };
 
-  // Handle cell selection
   const handleCellPress = (row: number, col: number) => {
     if (!grid[row][col].isFilled) return;
 
     if (selectedCell && selectedCell.row === row && selectedCell.col === col) {
-      // Toggle direction if tapping the same cell
-      const newDirection = direction === 'across' ? 'down' : 'across';
+      const newDirection = direction === "across" ? "down" : "across";
       setDirection(newDirection);
 
       const newClue = getClueNumberFromCell(row, col, grid, newDirection);
       setSelectedClue(newClue);
     } else {
-      // Select new cell
       setSelectedCell({ row, col });
 
-      // Determine if we should switch direction
       const canGoAcross = grid[row][col].isAcross;
       const canGoDown = grid[row][col].isDown;
 
-      if (canGoAcross && (!canGoDown || direction === 'across')) {
-        setDirection('across');
-        const newClue = getClueNumberFromCell(row, col, grid, 'across');
+      if (canGoAcross && (!canGoDown || direction === "across")) {
+        setDirection("across");
+        const newClue = getClueNumberFromCell(row, col, grid, "across");
         setSelectedClue(newClue);
       } else if (canGoDown) {
-        setDirection('down');
-        const newClue = getClueNumberFromCell(row, col, grid, 'down');
+        setDirection("down");
+        const newClue = getClueNumberFromCell(row, col, grid, "down");
         setSelectedClue(newClue);
       }
     }
   };
 
-  // Toggle direction when clue text is tapped
   const handleClueTextPress = () => {
     if (!selectedCell) return;
 
@@ -408,16 +398,14 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     const canGoAcross = grid[row][col].isAcross;
     const canGoDown = grid[row][col].isDown;
 
-    // Only toggle if the cell can go in both directions
     if (canGoAcross && canGoDown) {
-      const newDirection = direction === 'across' ? 'down' : 'across';
+      const newDirection = direction === "across" ? "down" : "across";
       setDirection(newDirection);
       const newClue = getClueNumberFromCell(row, col, grid, newDirection);
       setSelectedClue(newClue);
     }
   };
 
-  // Handle keyboard input
   const handleKeyPress = (key: string) => {
     if (isCompleted || !selectedCell) return;
 
@@ -425,18 +413,14 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     const newGrid = [...grid];
 
     if (/^[A-Za-z]$/.test(key)) {
-      // Handle letter input
       newGrid[row][col].userInput = key.toUpperCase();
       newGrid[row][col].isFilled = true;
 
-      // Move to next cell
       moveToNextCell(row, col);
-    } else if (key === 'Backspace' || key === 'Delete') {
-      // Handle backspace/delete
-      if (newGrid[row][col].userInput !== '') {
-        newGrid[row][col].userInput = '';
+    } else if (key === "Backspace" || key === "Delete") {
+      if (newGrid[row][col].userInput !== "") {
+        newGrid[row][col].userInput = "";
       } else {
-        // Move to previous cell if current cell is empty
         moveToPrevCell(row, col);
       }
     }
@@ -444,10 +428,8 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     setGrid(newGrid);
   };
 
-  // Move to the next cell in the current direction
   const moveToNextCell = (row: number, col: number) => {
-    if (direction === 'across') {
-      // Find next cell horizontally
+    if (direction === "across") {
       let nextCol = col + 1;
       while (nextCol < size) {
         if (grid[row][nextCol].isFilled) {
@@ -457,20 +439,20 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         nextCol++;
       }
 
-      // If at the end of the row, move to next row if there's a clue
-      const acrossClue = acrossClues.find(clue =>
+      const acrossClue = acrossClues.find((clue) =>
         clue.cells.some(([r, c]) => r === row && c === col)
       );
 
       if (acrossClue) {
-        const currentIndex = acrossClue.cells.findIndex(([r, c]) => r === row && c === col);
+        const currentIndex = acrossClue.cells.findIndex(
+          ([r, c]) => r === row && c === col
+        );
         if (currentIndex !== -1 && currentIndex < acrossClue.cells.length - 1) {
           const [nextRow, nextCol] = acrossClue.cells[currentIndex + 1];
           handleCellPress(nextRow, nextCol);
         }
       }
     } else {
-      // Find next cell vertically
       let nextRow = row + 1;
       while (nextRow < size) {
         if (grid[nextRow][col].isFilled) {
@@ -480,11 +462,14 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         nextRow++;
       }
 
-      // If at the end of the column, stay put
-      const downClue = downClues.find(clue => clue.cells.some(([r, c]) => r === row && c === col));
+      const downClue = downClues.find((clue) =>
+        clue.cells.some(([r, c]) => r === row && c === col)
+      );
 
       if (downClue) {
-        const currentIndex = downClue.cells.findIndex(([r, c]) => r === row && c === col);
+        const currentIndex = downClue.cells.findIndex(
+          ([r, c]) => r === row && c === col
+        );
         if (currentIndex !== -1 && currentIndex < downClue.cells.length - 1) {
           const [nextRow, nextCol] = downClue.cells[currentIndex + 1];
           handleCellPress(nextRow, nextCol);
@@ -493,10 +478,8 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     }
   };
 
-  // Move to the previous cell in the current direction
   const moveToPrevCell = (row: number, col: number) => {
-    if (direction === 'across') {
-      // Find previous cell horizontally
+    if (direction === "across") {
       let prevCol = col - 1;
       while (prevCol >= 0) {
         if (grid[row][prevCol].isFilled) {
@@ -506,7 +489,6 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         prevCol--;
       }
     } else {
-      // Find previous cell vertically
       let prevRow = row - 1;
       while (prevRow >= 0) {
         if (grid[prevRow][col].isFilled) {
@@ -518,12 +500,13 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
     }
   };
 
-  // Navigate to the next clue
   const goToNextClue = () => {
     if (!selectedClue) return;
 
-    const currentClues = direction === 'across' ? acrossClues : downClues;
-    const currentIndex = currentClues.findIndex(clue => clue.number === selectedClue);
+    const currentClues = direction === "across" ? acrossClues : downClues;
+    const currentIndex = currentClues.findIndex(
+      (clue) => clue.number === selectedClue
+    );
 
     if (currentIndex !== -1 && currentIndex < currentClues.length - 1) {
       // Go to next clue in the same direction
@@ -535,8 +518,8 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
       setSelectedCell({ row: nextRow, col: nextCol });
     } else if (currentIndex === currentClues.length - 1) {
       // If at the end of current direction clues, go to first clue of the other direction
-      const newDirection = direction === 'across' ? 'down' : 'across';
-      const newClues = newDirection === 'across' ? acrossClues : downClues;
+      const newDirection = direction === "across" ? "down" : "across";
+      const newClues = newDirection === "across" ? acrossClues : downClues;
 
       if (newClues.length > 0) {
         setDirection(newDirection);
@@ -553,8 +536,10 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
   const goToPrevClue = () => {
     if (!selectedClue) return;
 
-    const currentClues = direction === 'across' ? acrossClues : downClues;
-    const currentIndex = currentClues.findIndex(clue => clue.number === selectedClue);
+    const currentClues = direction === "across" ? acrossClues : downClues;
+    const currentIndex = currentClues.findIndex(
+      (clue) => clue.number === selectedClue
+    );
 
     if (currentIndex > 0) {
       // Go to previous clue in the same direction
@@ -566,8 +551,8 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
       setSelectedCell({ row: prevRow, col: prevCol });
     } else if (currentIndex === 0) {
       // If at the beginning of current direction clues, go to last clue of the other direction
-      const newDirection = direction === 'across' ? 'down' : 'across';
-      const newClues = newDirection === 'across' ? acrossClues : downClues;
+      const newDirection = direction === "across" ? "down" : "across";
+      const newClues = newDirection === "across" ? acrossClues : downClues;
 
       if (newClues.length > 0) {
         setDirection(newDirection);
@@ -587,14 +572,16 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
 
     const { row, col } = selectedCell;
     const currentClue =
-      direction === 'across'
-        ? acrossClues.find(clue => clue.number === selectedClue)
-        : downClues.find(clue => clue.number === selectedClue);
+      direction === "across"
+        ? acrossClues.find((clue) => clue.number === selectedClue)
+        : downClues.find((clue) => clue.number === selectedClue);
 
     if (!currentClue) return;
 
     // Find the index of the current cell in the clue
-    const cellIndex = currentClue.cells.findIndex(([r, c]) => r === row && c === col);
+    const cellIndex = currentClue.cells.findIndex(
+      ([r, c]) => r === row && c === col
+    );
 
     if (cellIndex !== -1) {
       const correctLetter = currentClue.answer[cellIndex];
@@ -606,7 +593,7 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         setGrid(newGrid);
       } else {
         // Incorrect - shake animation could be added here
-        Alert.alert('Incorrect', 'This letter is not correct.');
+        Alert.alert("Incorrect", "This letter is not correct.");
       }
     }
   };
@@ -615,30 +602,34 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   // Render single cell in the grid
   const renderCell = (cell: Cell, rowIndex: number, colIndex: number) => {
     const isSelected =
-      selectedCell && selectedCell.row === rowIndex && selectedCell.col === colIndex;
+      selectedCell &&
+      selectedCell.row === rowIndex &&
+      selectedCell.col === colIndex;
 
     const isHighlighted =
       selectedCell &&
       selectedClue &&
-      ((direction === 'across' &&
+      ((direction === "across" &&
         rowIndex === selectedCell.row &&
-        getClueNumberFromCell(rowIndex, colIndex, grid, 'across') === selectedClue) ||
-        (direction === 'down' &&
+        getClueNumberFromCell(rowIndex, colIndex, grid, "across") ===
+          selectedClue) ||
+        (direction === "down" &&
           colIndex === selectedCell.col &&
-          getClueNumberFromCell(rowIndex, colIndex, grid, 'down') === selectedClue));
+          getClueNumberFromCell(rowIndex, colIndex, grid, "down") ===
+            selectedClue));
 
     // If cell is not filled (not part of any clue), render it as black
     if (!cell.isFilled) {
       return (
         <View
           key={`cell-${rowIndex}-${colIndex}`}
-          style={[styles.cell, { backgroundColor: '#000000' }]}
+          style={[styles.cell, { backgroundColor: "#000000" }]}
         />
       );
     }
@@ -662,30 +653,33 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
       <TouchableOpacity
         key={`cell-${rowIndex}-${colIndex}`}
         style={[styles.cell, { backgroundColor: cellBgColor }]}
-        onPress={() => handleCellPress(rowIndex, colIndex)}>
-        {cell.clueNumber && <Text style={styles.clueNumber}>{cell.clueNumber}</Text>}
+        onPress={() => handleCellPress(rowIndex, colIndex)}
+      >
+        {cell.clueNumber && (
+          <Text style={styles.clueNumber}>{cell.clueNumber}</Text>
+        )}
         <Text style={styles.cellInput}>{cell.userInput}</Text>
       </TouchableOpacity>
     );
   };
 
-  // Render keyboard component
   const renderKeyboard = () => {
     const letters = [
-      ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-      ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-      ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
+      ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+      ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+      ["z", "x", "c", "v", "b", "n", "m"],
     ];
 
     return (
       <View style={styles.keyboard}>
         {/* Top keyboard row */}
         <View style={styles.keyboardRow}>
-          {letters[0].map(letter => (
+          {letters[0].map((letter) => (
             <TouchableOpacity
               key={`key-${letter}`}
               style={styles.letterTile}
-              onPress={() => handleKeyPress(letter)}>
+              onPress={() => handleKeyPress(letter)}
+            >
               <Text style={styles.letterText}>{letter}</Text>
             </TouchableOpacity>
           ))}
@@ -693,11 +687,12 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
 
         {/* Middle keyboard row */}
         <View style={styles.keyboardRow}>
-          {letters[1].map(letter => (
+          {letters[1].map((letter) => (
             <TouchableOpacity
               key={`key-${letter}`}
               style={styles.letterTile}
-              onPress={() => handleKeyPress(letter)}>
+              onPress={() => handleKeyPress(letter)}
+            >
               <Text style={styles.letterText}>{letter}</Text>
             </TouchableOpacity>
           ))}
@@ -709,16 +704,20 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
             <Text style={styles.specialKeyText}>More</Text>
           </TouchableOpacity>
 
-          {letters[2].map(letter => (
+          {letters[2].map((letter) => (
             <TouchableOpacity
               key={`key-${letter}`}
               style={styles.letterTile}
-              onPress={() => handleKeyPress(letter)}>
+              onPress={() => handleKeyPress(letter)}
+            >
               <Text style={styles.letterText}>{letter}</Text>
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity style={styles.specialKey} onPress={() => handleKeyPress('Backspace')}>
+          <TouchableOpacity
+            style={styles.specialKey}
+            onPress={() => handleKeyPress("Backspace")}
+          >
             <Text style={styles.specialKeyText}>⌫</Text>
           </TouchableOpacity>
         </View>
@@ -727,34 +726,29 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
   };
 
   // Calculate dynamic cell size based on screen width
-  const screenWidth = Dimensions.get('window').width;
+  const screenWidth = Dimensions.get("window").width;
   const cellSize = Math.min(screenWidth / (size + 1), 75);
   const gridSize = cellSize * size + 20; // +20 for border
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[styles.container, { backgroundColor: mergedTheme.backgroundColor }]}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={[
+        styles.container,
+        { backgroundColor: mergedTheme.backgroundColor },
+      ]}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+    >
       {/* Header with timer, title, and controls */}
       <View style={styles.header}>
         <Text style={styles.timer}>{formatTime(elapsedTime)}</Text>
         <Text style={styles.title}>{title}</Text>
         <View style={styles.headerButtons}>
           <TouchableOpacity onPress={handleCheckCell}>
-            <IconSymbol name={'pencil.and.outline'} color={''} />
+            <IconSymbol name={"checkmark.circle"} color={""} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              Alert.alert('Menu', 'Choose an option:', [
-                {
-                  text: 'Pause/Resume',
-                  onPress: isPaused ? resumeTimer : pauseTimer,
-                },
-                { text: 'Cancel', style: 'cancel' },
-              ]);
-            }}>
-            <IconSymbol name={'gear.badge.checkmark'} color={''} />
+          <TouchableOpacity onPress={shareCurrentClue}>
+            <IconSymbol name={"bubble.left.and.bubble.right.fill"} color={""} />
           </TouchableOpacity>
         </View>
       </View>
@@ -764,7 +758,9 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         <View style={styles.gridContainer}>
           {grid.map((row, rowIndex) => (
             <View key={`row-${rowIndex}`} style={styles.row}>
-              {row.map((cell, colIndex) => renderCell(cell, rowIndex, colIndex))}
+              {row.map((cell, colIndex) =>
+                renderCell(cell, rowIndex, colIndex)
+              )}
             </View>
           ))}
         </View>
@@ -775,26 +771,28 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
         {/* Clue bar */}
         <View style={styles.clueBar}>
           <TouchableOpacity style={styles.clueNavButton} onPress={goToPrevClue}>
-            <IconSymbol name={'chevron.left'} color={'black'} />
+            <IconSymbol name={"chevron.left"} color={"black"} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.clueTextContainer} onPress={handleClueTextPress}>
+          <TouchableOpacity
+            style={styles.clueTextContainer}
+            onPress={handleClueTextPress}
+          >
             <Text style={styles.clueText}>
               {selectedClue
                 ? `${direction.toUpperCase()} ${selectedClue}: ${getClueText(
                     selectedClue,
                     direction
                   )}`
-                : ''}
+                : ""}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.clueNavButton} onPress={goToNextClue}>
-            <IconSymbol name={'chevron.right'} color={'black'} />
+            <IconSymbol name={"chevron.right"} color={"black"} />
           </TouchableOpacity>
         </View>
 
-        {/* Custom keyboard */}
         {renderKeyboard()}
       </View>
     </KeyboardAvoidingView>
@@ -804,144 +802,144 @@ export const MiniCrossword: React.FC<CrosswordProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   header: {
-    flexDirection: 'row',
-    width: '100%',
+    flexDirection: "row",
+    width: "100%",
     height: 60,
     paddingHorizontal: 30,
     paddingVertical: 10,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   timer: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: "600",
+    color: "#000000",
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#000000',
+    fontWeight: "600",
+    color: "#000000",
   },
   headerButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
     gap: 12,
   },
   headerButtonText: {
     fontSize: 22,
-    fontWeight: '600',
-    color: 'rgba(79, 133, 229, 1)',
+    fontWeight: "600",
+    color: "rgba(79, 133, 229, 1)",
   },
   gridOutline: {
     padding: 3,
-    backgroundColor: '#000000',
+    backgroundColor: "#000000",
   },
   gridContainer: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   cell: {
     flex: 1,
     aspectRatio: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 0.5,
-    borderColor: '#000',
+    borderColor: "#000",
   },
   clueNumber: {
-    position: 'absolute',
+    position: "absolute",
     top: 2,
     left: 2,
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   cellInput: {
     fontSize: 40,
-    fontWeight: 'semibold',
-    color: '#000',
+    fontWeight: "semibold",
+    color: "#000",
   },
   bottomContainer: {
-    width: '100%',
+    width: "100%",
   },
   clueBar: {
-    flexDirection: 'row',
-    backgroundColor: 'rgb(255, 255, 255)',
+    flexDirection: "row",
+    backgroundColor: "rgb(255, 255, 255)",
     height: 61,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
   clueNavButton: {
     width: 40,
-    backgroundColor: 'rgba(167, 216, 255, 1)',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(167, 216, 255, 1)",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   clueNavButtonText: {
     fontSize: 22,
-    color: '#000000',
+    color: "#000000",
   },
   clueTextContainer: {
     flex: 1,
-    backgroundColor: 'rgba(167, 216, 255, 1)',
-    height: '100%',
+    backgroundColor: "rgba(167, 216, 255, 1)",
+    height: "100%",
     paddingHorizontal: 6,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   clueText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#000000',
+    fontWeight: "500",
+    color: "#000000",
   },
   keyboard: {
     height: 237,
-    backgroundColor: 'rgba(220, 220, 220, 1)',
+    backgroundColor: "rgba(220, 220, 220, 1)",
     padding: 2,
-    width: '100%',
+    width: "100%",
   },
   keyboardRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 6,
     marginVertical: 2.5,
   },
   letterTile: {
     width: 33,
     height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
     borderRadius: 5,
     borderBottomWidth: 2,
-    borderBottomColor: 'rgb(172, 175, 178)',
+    borderBottomColor: "rgb(172, 175, 178)",
   },
   letterText: {
     fontSize: 22,
-    color: '#000000',
-    textTransform: 'capitalize',
+    color: "#000000",
+    textTransform: "capitalize",
   },
   specialKey: {
     width: 47,
     height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(186, 189, 193, 1)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(186, 189, 193, 1)",
     borderRadius: 5,
     borderBottomWidth: 2,
-    borderBottomColor: 'rgba(123, 125, 127, 1)',
+    borderBottomColor: "rgba(123, 125, 127, 1)",
   },
   specialKeyText: {
     fontSize: 16,
-    color: '#000000',
+    color: "#000000",
   },
 });
