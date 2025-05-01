@@ -1,4 +1,12 @@
-import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Linking,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import { MiffyText } from "@/components/MiffyText";
@@ -42,11 +50,18 @@ export default function HomeScreen() {
             isItalic
             color={Colors.miffySeconday}
           />
-          <MiffyText
-            text="Tulips were so valuable in 17th century Netherlands that they caused 'Tulip Mania', a speculative bubble where bulbs traded for prices higher than houses!"
-            size={18}
-            color={Colors.miffySeconday}
-          />
+          <Text
+            style={{
+              fontFamily: "DMSerifDisplay_400Regular",
+              fontSize: 18,
+              color: Colors.miffySeconday,
+              textAlign: "center",
+            }}
+          >
+            Tulips were so valuable in 17th century Netherlands that they caused
+            'Tulip Mania', a speculative bubble where bulbs traded for prices
+            higher than houses!
+          </Text>
         </View>
 
         <View style={styles.guestSpotContainer}>
@@ -80,13 +95,44 @@ export default function HomeScreen() {
         <View
           style={[
             styles.dayContainer,
-            { backgroundColor: Colors.miffyAccent, gap: 24 },
+            {
+              backgroundColor: Colors.miffyAccent,
+              gap: 24,
+              overflow: "hidden",
+            },
           ]}
         >
           <MiffyText
             text="Bored of this already Watch these instead"
             size={30}
             color={"#fff"}
+          />
+          <Image
+            style={{
+              position: "absolute",
+              top: 130,
+              left: -95,
+              transform: [{ rotate: "49deg" }],
+            }}
+            source={require("@assets/jasmine-min.png")}
+          />
+          <Image
+            style={{
+              position: "absolute",
+              top: 160,
+              right: -85,
+              transform: [{ rotate: "-20deg" }, { scaleX: -1 }],
+            }}
+            source={require("@assets/jasmine-min.png")}
+          />
+          <Image
+            style={{
+              position: "absolute",
+              bottom: -60,
+              left: -50,
+              transform: [{ rotate: "-24deg" }],
+            }}
+            source={require("@assets/jasmine-min.png")}
           />
           <TouchableOpacity
             style={{
@@ -97,6 +143,9 @@ export default function HomeScreen() {
               borderRadius: 12,
               paddingVertical: 16,
               backgroundColor: "#D7E1FB40",
+            }}
+            onPress={() => {
+              Linking.openURL("https://www.youtube.com/watch?v=JW5q4w0DDwA");
             }}
           >
             <MiffyText text="Daily Reel" size={30} color={"#fff"} />
@@ -111,6 +160,11 @@ export default function HomeScreen() {
               paddingVertical: 16,
               backgroundColor: "#D7E1FB40",
             }}
+            onPress={() => {
+              Linking.openURL(
+                "https://www.tiktok.com/@alecjimenez31/video/7250885316276669742?lang=en"
+              );
+            }}
           >
             <MiffyText text="Daily TikTok" size={30} color={"#fff"} />
           </TouchableOpacity>
@@ -124,9 +178,59 @@ export default function HomeScreen() {
               paddingVertical: 16,
               backgroundColor: "#D7E1FB40",
             }}
+            onPress={() => {
+              Linking.openURL("https://www.youtube.com/watch?v=JW5q4w0DDwA");
+            }}
           >
             <MiffyText text="Youtube Video" size={30} color={"#fff"} />
           </TouchableOpacity>
+        </View>
+
+        <View
+          style={[
+            styles.dayContainer,
+            {
+              backgroundColor: Colors.miffyAccent,
+              gap: 24,
+              padding: 20,
+              overflow: "hidden",
+            },
+          ]}
+        >
+          <Image
+            style={{
+              position: "absolute",
+            }}
+            source={require("@assets/music.png")}
+          />
+          <MiffyText text="Song Time" size={68} color={"#fff"} />
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 12,
+              paddingLeft: 40,
+              alignItems: "center",
+              justifyContent: "flex-end",
+              width: "100%",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "DMSerifDisplay_400Regular",
+                fontSize: 26,
+                color: "white",
+                textAlign: "right",
+                textOverflow: "wrap",
+              }}
+            >
+              Flightless bird, American Mouth
+            </Text>
+
+            <Image
+              style={{ borderRadius: 10 }}
+              source={require("@assets/songArt/1.jpg")}
+            />
+          </View>
         </View>
 
         <View style={{ height: 50 }} />
