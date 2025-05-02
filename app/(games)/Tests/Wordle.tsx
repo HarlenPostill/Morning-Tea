@@ -29,6 +29,7 @@ export default function Wordle() {
           onGameEnd={handleGameComplete}
         />
       </ThemedView>
+      <Confetti size={2} ref={confettiRef} />
     </>
   );
 }
