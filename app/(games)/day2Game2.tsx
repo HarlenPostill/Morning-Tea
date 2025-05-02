@@ -22,7 +22,7 @@ export default function Day2Game2() {
     <ThemedView style={styles.container}>
       <MiniCrossword
         gameId="day2game2"
-        title="Mini Crossword"
+        title="Harlen's Mini"
         acrossClues={[
           {
             number: 1,

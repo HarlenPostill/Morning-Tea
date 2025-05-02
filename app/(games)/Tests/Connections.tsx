@@ -26,26 +26,26 @@ export default function Connections() {
         categories={[
           {
             id: 'places',
-            name: 'Hollownight Places',
-            words: ['Dirtmout', 'Greenpath', 'Deepnest', 'City of Tears'],
+            name: 'Hollownight',
+            words: ['Dirtmout', 'Greenpath', 'Deepnest', 'City'],
             color: 'yellow',
           },
           {
             id: 'characters',
-            name: 'Hunger Games Characters',
+            name: 'Hunger',
             words: ['Peeta', 'Coriolanus', 'Haymitch', 'Katniss'],
             color: 'green',
           },
           {
             id: 'family',
-            name: 'Family Guy Members',
+            name: 'Family',
             words: ['Lois', 'Brian', 'Chris', 'Stewie'],
             color: 'blue',
           },
           {
             id: 'songs',
-            name: 'Melodrama songs',
-            words: ['Sober', 'Supercut', 'Green Light', 'Perfect Places'],
+            name: 'Melodrama',
+            words: ['Sober', 'Supercut', 'Green', 'Perfect'],
             color: 'purple',
           },
         ]}
