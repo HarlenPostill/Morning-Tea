@@ -1,20 +1,13 @@
 import { StyleSheet } from 'react-native';
 
 import { ThemedView } from '@/components/ThemedView';
-import CustomWordle from '@/components/games/CustomWordle';
+import LaddersGame from '@/components/games/LaddersGame';
 
 export default function Day1Game2() {
   return (
-    <>
-      <ThemedView style={styles.container}>
-        <CustomWordle
-          dailyWord="love"
-          gameId="day1game2"
-          maxAttempts={6}
-          onGameEnd={won => console.log(won ? 'Game won!' : 'Game lost!')}
-        />
-      </ThemedView>
-    </>
+    <ThemedView style={styles.container}>
+      <LaddersGame gameId={'day1game2'} title="Grub to Glam" startWord={'Grub'} goalWord={'Glam'} />
+    </ThemedView>
   );
 }
 

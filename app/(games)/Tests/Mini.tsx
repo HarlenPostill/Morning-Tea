@@ -5,7 +5,7 @@ import { MiniCrossword } from '@/components/games/MiniCrossword';
 import { useState, useRef } from 'react';
 import Confetti from 'react-native-confetti';
 
-export default function Day1Game3() {
+export default function Mini() {
   const [gameWon, setGameWon] = useState(false);
   const confettiRef = useRef<Confetti | null>(null);
 
@@ -22,8 +22,8 @@ export default function Day1Game3() {
   return (
     <ThemedView style={styles.container}>
       <MiniCrossword
-        gameId="day1game3"
-        title="Harlen's Mini"
+        gameId="Mini"
+        title="Mini Crossword"
         acrossClues={[
           {
             number: 1,

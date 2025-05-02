@@ -4,7 +4,7 @@ import { ThemedView } from '@/components/ThemedView';
 import ConnectionsGame from '@/components/games/ConnectionsGame';
 import Confetti from 'react-native-confetti';
 
-export default function Day1Game1() {
+export default function Connections() {
   const [gameWon, setGameWon] = useState(false);
   const confettiRef = useRef<Confetti | null>(null);
 
@@ -21,31 +21,31 @@ export default function Day1Game1() {
   return (
     <ThemedView style={styles.container}>
       <ConnectionsGame
-        gameId="day1game1"
-        title="Harlen's Connection"
+        gameId="connections"
+        title="Test Connection"
         categories={[
           {
-            id: 'plushies',
-            name: 'Names of Plushies',
-            words: ['crayon', 'miffy', 'quebbin', 'baby fresh'],
+            id: 'places',
+            name: 'Hollownight Places',
+            words: ['Dirtmout', 'Greenpath', 'Deepnest', 'City of Tears'],
             color: 'yellow',
           },
           {
-            id: 'dinners',
-            name: 'Dinners that Start with Chicken',
-            words: ['Shnitzel', 'Soup', 'Kiev', 'Alfredo'],
+            id: 'characters',
+            name: 'Hunger Games Characters',
+            words: ['Peeta', 'Coriolanus', 'Haymitch', 'Katniss'],
             color: 'green',
           },
           {
-            id: 'mario',
-            name: 'Mario Enemies',
-            words: ['Goomba', 'Koopa', 'Blooper', 'Boo'],
+            id: 'family',
+            name: 'Family Guy Members',
+            words: ['Lois', 'Brian', 'Chris', 'Stewie'],
             color: 'blue',
           },
           {
-            id: 'movies',
-            name: 'Movie Marketing Materials',
-            words: ['Trailer', 'Poster', 'Interview', 'Teaser'],
+            id: 'songs',
+            name: 'Melodrama songs',
+            words: ['Sober', 'Supercut', 'Green Light', 'Perfect Places'],
             color: 'purple',
           },
         ]}
