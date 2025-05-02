@@ -27,25 +27,25 @@ export default function Day1Game1() {
           {
             id: 'plushies',
             name: 'Names of Plushies',
-            words: ['crayon', 'miffy', 'quebbin', 'baby fresh'],
+            words: ['CRAYON', 'MIFFY', 'QUEBBIN', 'BABY FRESH'],
             color: 'yellow',
           },
           {
             id: 'dinners',
             name: 'Dinners that Start with Chicken',
-            words: ['Shnitzel', 'Soup', 'Kiev', 'Alfredo'],
+            words: ['SHNITZEL', 'SOUP', 'KIEV', 'ALFREDO'],
             color: 'green',
           },
           {
             id: 'mario',
             name: 'Mario Enemies',
-            words: ['Goomba', 'Koopa', 'Blooper', 'Boo'],
+            words: ['GOOMBA', 'KOOPA', 'BLOOPER', 'BOO'],
             color: 'blue',
           },
           {
             id: 'movies',
             name: 'Movie Marketing Materials',
-            words: ['Trailer', 'Poster', 'Interview', 'Teaser'],
+            words: ['TRAILER', 'POSTER', 'INTERVIEW', 'TEASER'],
             color: 'purple',
           },
         ]}

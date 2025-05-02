@@ -27,25 +27,25 @@ export default function Day3Game2() {
           {
             id: 'andre',
             name: 'Places you can find Andre',
-            words: ['Japan', 'gym', 'uts', 'rachel`s DMs'],
+            words: ['JAPAN', 'GYM', 'UTS', 'RACHEL`S DMS'],
             color: 'yellow',
           },
           {
             id: 'apple',
             name: 'Apple products without i',
-            words: ['pod', 'pad', 'mac', 'phone'],
+            words: ['POD', 'PAD', 'MAC', 'PHONE'],
             color: 'green',
           },
           {
             id: 'movie',
             name: 'Movie Theature Snacks',
-            words: ['popcorn', 'm&ms', 'Malteesers', 'choc top'],
+            words: ['POPCORN', 'M&Ms', 'MALTEASERS', 'CHOC TOP'],
             color: 'blue',
           },
           {
             id: 'countries',
             name: 'Countries that drive on the Right',
-            words: ['USA', 'france', 'china', 'south korea'],
+            words: ['USA', 'FRANCE', 'CHINA', 'SOUTH KOREA'],
             color: 'purple',
           },
         ]}

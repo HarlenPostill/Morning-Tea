@@ -27,25 +27,25 @@ export default function Day3Game1() {
           {
             id: 'games',
             name: 'Currencies in video games',
-            words: ['gold', 'coins', 'rupees', 'bells'],
+            words: ['GOLD', 'COINS', 'RUPEES', 'BELLS'],
             color: 'yellow',
           },
           {
             id: 'animals',
             name: 'Crafting materials in animal crossing',
-            words: ['wood', 'stone', 'ore', 'clay'],
+            words: ['WOOD', 'STONE', 'ORE', 'CLAY'],
             color: 'green',
           },
           {
             id: 'items',
             name: 'Key items in animal crossing',
-            words: ['slingshot', 'shovel', 'ladder', 'net'],
+            words: ['SLINGSHOT', 'SHOVEL', 'LADDER', 'NET'],
             color: 'blue',
           },
           {
             id: 'picnic',
             name: 'Things that went wrong on our picnic',
-            words: ['ants', 'poop', 'heat', 'spills'],
+            words: ['ANTS', 'POOP', 'HEAT', 'SPILLs'],
             color: 'purple',
           },
         ]}

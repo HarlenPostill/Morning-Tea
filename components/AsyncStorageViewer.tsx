@@ -80,6 +80,31 @@ export const AsyncStorageViewer = () => {
     ]);
   };
 
+  const handleDeleteAll = () => {
+    Alert.alert(
+      'Confirm Delete All',
+      'Are you sure you want to delete all items? This cannot be undone.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              getAllStorageItems();
+            } catch (error) {
+              Alert.alert('Error', 'Failed to delete all items');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleCancel = () => {
     setEditingItem(null);
     setEditedValue('');
@@ -88,6 +113,11 @@ export const AsyncStorageViewer = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>AsyncStorage Contents</Text>
+      <TouchableOpacity
+        style={[styles.button, styles.deleteButton]}
+        onPress={() => handleDeleteAll()}>
+        <Text style={styles.buttonText}>Delete All</Text>
+      </TouchableOpacity>
       <Text>(reboot app to see any changes saved)</Text>
       <ScrollView style={styles.scrollView}>
         {storageItems.map(item => (
