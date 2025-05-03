@@ -130,10 +130,10 @@ export default function Day25Game2() {
           {
             number: 6,
             text: 'Stinkiest major at uni, for short',
-            answer: 'CD',
+            answer: 'CS',
             cells: [
-              [0, 0],
-              [1, 0],
+              [2, 0],
+              [3, 0],
             ],
           },
         ]}
