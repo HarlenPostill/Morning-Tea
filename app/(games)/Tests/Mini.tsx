@@ -27,7 +27,7 @@ export default function Mini() {
         acrossClues={[
           {
             number: 1,
-            text: 'Doomscrolling',
+            text: 'blankspace',
             answer: 'REELS',
             cells: [
               [0, 0],
@@ -39,18 +39,19 @@ export default function Mini() {
           },
           {
             number: 5,
-            text: 'Songs from Mamma Mia',
+            text: 'blankspace',
             answer: 'ABBA',
             cells: [
               [1, 0],
               [1, 1],
               [1, 2],
               [1, 3],
+              [1, 4],
             ],
           },
           {
             number: 6,
-            text: 'Mushroom Kingdom Residents',
+            text: 'blankspace',
             answer: 'TOADS',
             cells: [
               [2, 0],
@@ -62,19 +63,24 @@ export default function Mini() {
           },
           {
             number: 8,
-            text: ' Milk Alternative Ingredient',
+            text: 'blankspace',
             answer: 'SOY',
             cells: [
               [3, 0],
               [3, 1],
               [3, 2],
+              [3, 3],
+              [3, 4],
             ],
           },
           {
             number: 9,
-            text: 'Santa Likes them?',
+            text: 'blankspace',
             answer: 'HO',
             cells: [
+              [4, 0],
+              [4, 1],
+              [4, 2],
               [4, 3],
               [4, 4],
             ],
@@ -83,18 +89,19 @@ export default function Mini() {
         downClues={[
           {
             number: 1,
-            text: 'Mascot Squatter',
+            text: 'blankspace',
             answer: 'RATS',
             cells: [
               [0, 0],
               [1, 0],
               [2, 0],
               [3, 0],
+              [4, 0],
             ],
           },
           {
             number: 2,
-            text: 'Kindling material?',
+            text: 'blankspace',
             answer: 'EBOOK',
             cells: [
               [0, 1],
@@ -106,30 +113,35 @@ export default function Mini() {
           },
           {
             number: 3,
-            text: 'A Place to find GIRLS',
+            text: 'blankspace',
             answer: 'EBAY',
             cells: [
               [0, 2],
               [1, 2],
               [2, 2],
               [3, 2],
+              [4, 2],
             ],
           },
           {
             number: 4,
-            text: 'A mate or buddy',
+            text: 'blankspace',
             answer: 'LAD',
             cells: [
               [0, 3],
               [1, 3],
               [2, 3],
+              [3, 3],
+              [4, 3],
             ],
           },
           {
             number: 7,
-            text: 'Salty Cracker',
+            text: 'blankspace',
             answer: 'SAO',
             cells: [
+              [0, 4],
+              [1, 4],
               [2, 4],
               [3, 4],
               [4, 4],
