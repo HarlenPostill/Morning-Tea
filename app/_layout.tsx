@@ -58,6 +58,7 @@ export default function RootLayout() {
             headerTintColor: Colors.light.tint,
           }}
         />
+        <Stack.Screen name="(intro)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="dark" />
