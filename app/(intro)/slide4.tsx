@@ -317,7 +317,7 @@ export default function Slide4() {
             alignItems: "center",
           }}
           onPress={() => {
-            router.push("/(intro)/slide3");
+            router.push("/(intro)/slide5");
           }}
         >
           <MiffyText color={Colors.miffySeconday} text="Next" />
