@@ -1,6 +1,7 @@
 import { MiffyText } from "@/components/MiffyText";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Colors } from "@/constants/Colors";
+import { getTimeOfDay } from "@/helpers/time";
 import { router } from "expo-router";
 import React from "react";
 import {
@@ -12,18 +13,6 @@ import {
 } from "react-native";
 
 export default function Day1Intro() {
-  function getTimeOfDay(date: any) {
-    const currentHour = date.getHours();
-
-    if (currentHour >= 4 && currentHour < 12) {
-      return "Morning";
-    } else if (currentHour >= 12 && currentHour < 18) {
-      return "Afternoon";
-    } else {
-      return "Evening";
-    }
-  }
-
   const now = new Date();
   const timeOfDay = getTimeOfDay(now);
   console.log(timeOfDay);
@@ -50,7 +39,7 @@ export default function Day1Intro() {
           <MiffyText
             isItalic
             color={Colors.miffySeconday}
-            text={`Good ${timeOfDay} Sweetie`}
+            text={`Good ${timeOfDay} Cutie`}
           />
           <Image
             style={styles.jasmineTopRight}
