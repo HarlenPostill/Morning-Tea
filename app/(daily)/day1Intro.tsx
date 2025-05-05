@@ -1,16 +1,10 @@
-import { MiffyText } from "@/components/MiffyText";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { Colors } from "@/constants/Colors";
-import { getTimeOfDay } from "@/helpers/time";
-import { router } from "expo-router";
-import React from "react";
-import {
-  Image,
-  SafeAreaView,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-} from "react-native";
+import { MiffyText } from '@/components/MiffyText';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Colors } from '@/constants/Colors';
+import { getTimeOfDay } from '@/helpers/time';
+import { router } from 'expo-router';
+import React from 'react';
+import { Image, SafeAreaView, TouchableOpacity, View, StyleSheet } from 'react-native';
 
 export default function Day1Intro() {
   const now = new Date();
@@ -21,54 +15,37 @@ export default function Day1Intro() {
     <SafeAreaView>
       <View
         style={{
-          width: "100%",
-          height: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+          width: '100%',
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
         <View
           style={{
             flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: 'center',
+            alignItems: 'center',
             padding: 40,
-          }}
-        >
-          <Image style={{}} source={require("@assets/miffyHide.png")} />
-          <MiffyText
-            isItalic
-            color={Colors.miffySeconday}
-            text={`Good ${timeOfDay} Cutie`}
-          />
-          <Image
-            style={styles.jasmineTopRight}
-            source={require("@assets/jasmine-min.png")}
-          />
-          <Image
-            style={styles.jasmineBottomLeft}
-            source={require("@assets/jasmine-min.png")}
-          />
+          }}>
+          <Image style={{}} source={require('@assets/miffyHide.png')} />
+          <MiffyText isItalic color={Colors.miffySeconday} text={`Good ${timeOfDay} Cutie`} />
+          <Image style={styles.jasmineTopRight} source={require('@assets/jasmine-min.png')} />
+          <Image style={styles.jasmineBottomLeft} source={require('@assets/jasmine-min.png')} />
         </View>
         <TouchableOpacity
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: 705,
             gap: 8,
             right: 45,
-            flexDirection: "row",
-            alignItems: "center",
+            flexDirection: 'row',
+            alignItems: 'center',
           }}
           onPress={() => {
-            router.push("/(tabs)/home");
-          }}
-        >
+            router.push('/(intro)/slide1');
+          }}>
           <MiffyText color={Colors.miffySeconday} text="Continue" />
-          <IconSymbol
-            name={"chevron.forward.circle.fill"}
-            size={30}
-            color={Colors.miffySeconday}
-          />
+          <IconSymbol name={'chevron.forward.circle.fill'} size={30} color={Colors.miffySeconday} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -77,15 +54,15 @@ export default function Day1Intro() {
 
 const styles = StyleSheet.create({
   jasmineTopRight: {
-    position: "absolute",
+    position: 'absolute',
     top: -80,
     right: -30,
     transform: [{ scaleY: -1 }],
   },
   jasmineBottomLeft: {
-    position: "absolute",
+    position: 'absolute',
     bottom: -70,
     left: -55,
-    transform: [{ rotate: "30deg" }],
+    transform: [{ rotate: '30deg' }],
   },
 });

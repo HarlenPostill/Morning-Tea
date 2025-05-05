@@ -13,7 +13,6 @@ export default function Slide1() {
         <View
           style={{ gap: 50, flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
           <Image style={{}} source={require('@assets/miffyHide.png')} />
-          <MiffyText isItalic color={Colors.miffySeconday} text={'Good Afternoon Sweetie'} />
         </View>
         <TouchableOpacity
           style={{
@@ -27,7 +26,7 @@ export default function Slide1() {
           onPress={() => {
             router.push('/(intro)/slide2');
           }}>
-          <MiffyText color={Colors.miffySeconday} text="Next" />
+          <MiffyText color={Colors.miffySeconday} text="Hi Miffy" />
           <IconSymbol name={'chevron.forward.circle.fill'} size={30} color={Colors.miffySeconday} />
         </TouchableOpacity>
       </View>

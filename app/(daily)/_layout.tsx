@@ -3,26 +3,25 @@ import {
   DefaultTheme,
   ThemeProvider,
   //@ts-ignore
-} from "@react-navigation/native";
-import { Stack } from "expo-router";
+} from '@react-navigation/native';
+import { Stack } from 'expo-router';
 
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/constants/Colors";
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 export default function IntroLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack
         screenOptions={{
           contentStyle: {
             backgroundColor: Colors.miffyOther,
-            position: "relative",
+            position: 'relative',
           },
           headerShown: false,
-        }}
-      >
+        }}>
         <Stack.Screen name="day1Intro" />
         <Stack.Screen name="day2Intro" />
         <Stack.Screen name="day3Intro" />
@@ -33,7 +32,7 @@ export default function IntroLayout() {
         <Stack.Screen name="day8Intro" />
         <Stack.Screen name="day9Intro" />
         <Stack.Screen name="day10Intro" />
-        <Stack.Screen name="day11ntro" />
+        <Stack.Screen name="day11Intro" />
         <Stack.Screen name="day12Intro" />
         <Stack.Screen name="day13Intro" />
         <Stack.Screen name="day14Intro" />
