@@ -1,8 +1,8 @@
-//@ts-ignore
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
+  //@ts-ignore
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 

@@ -62,7 +62,7 @@ export default function Slide5() {
             alignItems: "center",
           }}
           onPress={() => {
-            router.push("/(tabs)");
+            router.push("/(tabs)/home");
           }}
         >
           <MiffyText color={Colors.miffySeconday} text="Next" />

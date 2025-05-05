@@ -49,20 +49,6 @@ export default function HomeScreen() {
           />
         </View>
 
-        <View
-          style={[
-            styles.dayContainer,
-            { backgroundColor: Colors.miffyPrimary },
-          ]}
-        >
-          <Button
-            title="Go to Slide 1"
-            onPress={() => {
-              router.push("/(daily)/day1Intro");
-            }}
-          />
-        </View>
-
         {/* Flower of the Day */}
         <View style={[styles.dayContainer, { backgroundColor: "#FCE0E5" }]}>
           <MiffyText

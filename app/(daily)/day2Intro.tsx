@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-export default function Day1Intro() {
+export default function Day2Intro() {
   function getTimeOfDay(date: any) {
     const currentHour = date.getHours();
 
@@ -50,7 +50,7 @@ export default function Day1Intro() {
           <MiffyText
             isItalic
             color={Colors.miffySeconday}
-            text={`Good ${timeOfDay} Sweetie`}
+            text={`Good ${timeOfDay} Honey`}
           />
           <Image
             style={styles.jasmineTopRight}

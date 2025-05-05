@@ -9,7 +9,7 @@ import { Stack } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 
-export default function IntroLayout() {
+export default function InitLayout() {
   const colorScheme = useColorScheme();
 
   return (
@@ -23,8 +23,7 @@ export default function IntroLayout() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="day1Intro" />
-        <Stack.Screen name="day2Intro" />
+        <Stack.Screen name="index" />
       </Stack>
     </ThemeProvider>
   );
