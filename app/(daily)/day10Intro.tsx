@@ -3,13 +3,64 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { getTimeOfDay } from '@/helpers/time';
 import { router } from 'expo-router';
-import React from 'react';
-import { Image, SafeAreaView, TouchableOpacity, View, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  Image,
+  SafeAreaView,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Animated,
+  Easing,
+} from 'react-native';
 
 export default function Day10Intro() {
   const now = new Date();
   const timeOfDay = getTimeOfDay(now);
-  console.log(timeOfDay);
+
+  const topRightAnim = useRef(new Animated.Value(0)).current;
+  const bottomLeftAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const createBounceAnimation = (animValue: Animated.Value) => {
+      return Animated.timing(animValue, {
+        toValue: 1,
+        duration: 1600,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: true,
+      });
+    };
+
+    Animated.parallel([
+      createBounceAnimation(topRightAnim),
+      Animated.sequence([Animated.delay(200), createBounceAnimation(bottomLeftAnim)]),
+    ]).start();
+  }, []);
+
+  const topRightTranslateY = topRightAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-100, 0],
+  });
+
+  const topRightRotate = topRightAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['30deg', '0deg'],
+  });
+
+  const bottomLeftTranslateX = bottomLeftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-80, 0],
+  });
+
+  const bottomLeftRotate = bottomLeftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['50deg', '30deg'],
+  });
+
+  const bottomLeftScale = bottomLeftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.8, 1],
+  });
 
   return (
     <SafeAreaView>
@@ -29,8 +80,33 @@ export default function Day10Intro() {
           }}>
           <Image style={{}} source={require('@assets/miffyHide.png')} />
           <MiffyText isItalic color={Colors.miffySeconday} text={`Good ${timeOfDay} Cutie Bear`} />
-          <Image style={styles.jasmineTopRight} source={require('@assets/jasmine-min.png')} />
-          <Image style={styles.jasmineBottomLeft} source={require('@assets/jasmine-min.png')} />
+          <Animated.Image
+            style={[
+              styles.jasmineTopRight,
+              {
+                transform: [
+                  { translateY: topRightTranslateY },
+                  { rotate: topRightRotate },
+                  { scaleY: -1 },
+                ],
+              },
+            ]}
+            source={require('@assets/flowers/lily.png')}
+          />
+
+          <Animated.Image
+            style={[
+              styles.jasmineBottomLeft,
+              {
+                transform: [
+                  { translateX: bottomLeftTranslateX },
+                  { rotate: bottomLeftRotate },
+                  { scale: bottomLeftScale },
+                ],
+              },
+            ]}
+            source={require('@assets/flowers/lily.png')}
+          />
         </View>
         <TouchableOpacity
           style={{
@@ -57,12 +133,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -80,
     right: -30,
-    transform: [{ scaleY: -1 }],
   },
   jasmineBottomLeft: {
     position: 'absolute',
     bottom: -70,
     left: -55,
-    transform: [{ rotate: '30deg' }],
   },
 });

@@ -91,7 +91,7 @@ export default function Day2Intro() {
                 ],
               },
             ]}
-            source={require('@assets/jasmine-min.png')}
+            source={require('@assets/flowers/tulips.png')}
           />
 
           <Animated.Image
@@ -105,7 +105,7 @@ export default function Day2Intro() {
                 ],
               },
             ]}
-            source={require('@assets/jasmine-min.png')}
+            source={require('@assets/flowers/tulips.png')}
           />
         </View>
         <TouchableOpacity

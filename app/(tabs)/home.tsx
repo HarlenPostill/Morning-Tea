@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   dayContainer: {
     gap: 12,
     borderRadius: 20,
-    padding: 40,
+    padding: 35,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
