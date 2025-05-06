@@ -133,12 +133,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -80,
     right: -30,
-    transform: [{ scaleY: -1 }],
   },
   jasmineBottomLeft: {
     position: 'absolute',
     bottom: -70,
     left: -55,
-    transform: [{ rotate: '30deg' }],
   },
 });
