@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface DayData {
   day: number;
@@ -16,6 +16,20 @@ interface DayContextType {
 
 const DayContext = createContext<DayContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'Day';
+
+// Helper function to convert date to YYYY-MM-DD format for consistent storage
+const formatDateForStorage = (date: Date): string => {
+  return date.toISOString().split('T')[0];
+};
+
+// Helper function to start of day in user's timezone
+const getStartOfDay = (date: Date): Date => {
+  const newDate = new Date(date);
+  newDate.setHours(0, 0, 0, 0);
+  return newDate;
+};
+
 const DayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentDay, setCurrentDayState] = useState<number>(1);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
@@ -24,25 +38,23 @@ const DayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     const initializeDaySystem = async () => {
       try {
-        const dayData = await AsyncStorage.getItem("Day");
+        const dayData = await AsyncStorage.getItem(STORAGE_KEY);
 
         if (!dayData) {
           // First time setup - set today as day 1
           await setCurrentDay(1);
         } else {
           // Parse existing day data
-          const [dayPart, datePart] = dayData.split(",");
-          const dayNumber = parseInt(dayPart.replace("Day:", ""));
-          const startDate = new Date(datePart);
+          const [dayPart, datePart] = dayData.split(',');
+          const dayNumber = parseInt(dayPart.replace('Day:', ''));
 
-          // Check if we need to increment the day
-          const today = new Date();
-          const currentTimestamp = today.getTime();
-          const lastTimestamp = startDate.getTime();
+          // Create dates using the stored date string
+          const startDate = getStartOfDay(new Date(datePart));
+          const today = getStartOfDay(new Date());
 
           // Calculate days difference
           const daysDifference = Math.floor(
-            (currentTimestamp - lastTimestamp) / (1000 * 60 * 60 * 24)
+            (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
           );
 
           if (daysDifference > 0) {
@@ -53,10 +65,9 @@ const DayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             setCurrentDayState(dayNumber);
           }
         }
-
         setIsInitialized(true);
       } catch (error) {
-        console.error("Error initializing day system:", error);
+        console.error('Error initializing day system:', error);
         // Fallback to day 1 if there's an error
         await setCurrentDay(1);
         setIsInitialized(true);
@@ -69,23 +80,23 @@ const DayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const setCurrentDay = async (day: number) => {
     try {
       const currentDate = new Date();
-      const formattedDate = currentDate.toLocaleDateString("en-GB"); // DD/MM/YYYY format
+      const formattedDate = formatDateForStorage(currentDate);
       const dayEntry = `Day:${day},${formattedDate}`;
 
-      await AsyncStorage.setItem("Day", dayEntry);
+      await AsyncStorage.setItem(STORAGE_KEY, dayEntry);
       setCurrentDayState(day);
     } catch (error) {
-      console.error("Error setting current day:", error);
+      console.error('Error setting current day:', error);
     }
   };
 
   const getDayData = async (): Promise<DayData | null> => {
     try {
-      const dayData = await AsyncStorage.getItem("Day");
+      const dayData = await AsyncStorage.getItem(STORAGE_KEY);
       if (!dayData) return null;
 
-      const [dayPart, datePart] = dayData.split(",");
-      const day = parseInt(dayPart.replace("Day:", ""));
+      const [dayPart, datePart] = dayData.split(',');
+      const day = parseInt(dayPart.replace('Day:', ''));
       const startDate = new Date(datePart);
 
       return {
@@ -94,7 +105,7 @@ const DayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         lastCheckedDate: new Date(),
       };
     } catch (error) {
-      console.error("Error getting day data:", error);
+      console.error('Error getting day data:', error);
       return null;
     }
   };
@@ -106,8 +117,7 @@ const DayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         setCurrentDay,
         isInitialized,
         getDayData,
-      }}
-    >
+      }}>
       {children}
     </DayContext.Provider>
   );
@@ -116,7 +126,7 @@ const DayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 export const useDayContext = () => {
   const context = useContext(DayContext);
   if (!context) {
-    throw new Error("useDayContext must be used within a DayProvider");
+    throw new Error('useDayContext must be used within a DayProvider');
   }
   return context;
 };
