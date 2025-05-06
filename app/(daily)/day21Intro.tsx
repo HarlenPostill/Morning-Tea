@@ -91,7 +91,7 @@ export default function Day21Intro() {
                 ],
               },
             ]}
-            source={require('@assets/flowers/baby.png')}
+            source={require('@assets/penguin.png')}
           />
 
           <Animated.Image
@@ -105,7 +105,7 @@ export default function Day21Intro() {
                 ],
               },
             ]}
-            source={require('@assets/flowers/baby.png')}
+            source={require('@assets/penguin.png')}
           />
         </View>
         <TouchableOpacity
@@ -131,12 +131,12 @@ export default function Day21Intro() {
 const styles = StyleSheet.create({
   jasmineTopRight: {
     position: 'absolute',
-    top: -80,
+    top: -120,
     right: -30,
   },
   jasmineBottomLeft: {
     position: 'absolute',
-    bottom: -70,
-    left: -55,
+    bottom: -100,
+    left: -85,
   },
 });

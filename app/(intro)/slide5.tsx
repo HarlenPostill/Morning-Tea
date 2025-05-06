@@ -2,10 +2,62 @@ import { MiffyText } from '@/components/MiffyText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { router } from 'expo-router';
-import React from 'react';
-import { Image, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  Animated,
+  Easing,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function Slide5() {
+  const topRightAnim = useRef(new Animated.Value(0)).current;
+  const bottomLeftAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const createBounceAnimation = (animValue: Animated.Value) => {
+      return Animated.timing(animValue, {
+        toValue: 1,
+        duration: 2000,
+        easing: Easing.out(Easing.exp),
+        useNativeDriver: true,
+      });
+    };
+
+    Animated.parallel([
+      createBounceAnimation(topRightAnim),
+      Animated.sequence([Animated.delay(200), createBounceAnimation(bottomLeftAnim)]),
+    ]).start();
+  }, []);
+
+  const topRightTranslateY = topRightAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-100, 0],
+  });
+
+  const topRightRotate = topRightAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['30deg', '0deg'],
+  });
+
+  const bottomLeftTranslateX = bottomLeftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-80, 0],
+  });
+
+  const bottomLeftRotate = bottomLeftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['50deg', '30deg'],
+  });
+
+  const bottomLeftScale = bottomLeftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.8, 1],
+  });
+
   return (
     <SafeAreaView>
       <View
@@ -26,8 +78,33 @@ export default function Slide5() {
           <MiffyText color={Colors.miffyPrimary} text={'Over 90 custom NYT style Puzzles'} />
           <MiffyText color={Colors.miffyAccent} text={'With 60 of them made by Harlen'} />
           <MiffyText color={Colors.miffySeconday} text={'And 30 celebrity guest puzzles'} />
-          <Image style={styles.jasmineTopRight} source={require('@assets/jasmine-min.png')} />
-          <Image style={styles.jasmineBottomLeft} source={require('@assets/jasmine-min.png')} />
+          <Animated.Image
+            style={[
+              styles.jasmineTopRight,
+              {
+                transform: [
+                  { translateY: topRightTranslateY },
+                  { rotate: topRightRotate },
+                  { scaleY: -1 },
+                ],
+              },
+            ]}
+            source={require('@assets/jasmine-min.png')}
+          />
+
+          <Animated.Image
+            style={[
+              styles.jasmineBottomLeft,
+              {
+                transform: [
+                  { translateX: bottomLeftTranslateX },
+                  { rotate: bottomLeftRotate },
+                  { scale: bottomLeftScale },
+                ],
+              },
+            ]}
+            source={require('@assets/jasmine-min.png')}
+          />
         </View>
         <TouchableOpacity
           style={{
@@ -54,12 +131,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -80,
     right: -30,
-    transform: [{ scaleY: -1 }],
   },
   jasmineBottomLeft: {
     position: 'absolute',
     bottom: -70,
     left: -55,
-    transform: [{ rotate: '30deg' }],
   },
 });

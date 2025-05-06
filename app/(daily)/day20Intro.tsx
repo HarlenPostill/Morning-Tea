@@ -91,7 +91,7 @@ export default function Day20Intro() {
                 ],
               },
             ]}
-            source={require('@assets/flowers/frangipani.png')}
+            source={require('@assets/murray.png')}
           />
 
           <Animated.Image
@@ -105,7 +105,7 @@ export default function Day20Intro() {
                 ],
               },
             ]}
-            source={require('@assets/flowers/frangipani.png')}
+            source={require('@assets/murray.png')}
           />
         </View>
         <TouchableOpacity
@@ -131,7 +131,7 @@ export default function Day20Intro() {
 const styles = StyleSheet.create({
   jasmineTopRight: {
     position: 'absolute',
-    top: -80,
+    top: -110,
     right: -30,
   },
   jasmineBottomLeft: {

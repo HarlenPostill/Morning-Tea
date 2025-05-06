@@ -91,7 +91,7 @@ export default function Day19Intro() {
                 ],
               },
             ]}
-            source={require('@assets/flowers/frangipani.png')}
+            source={require('@assets/ikea.png')}
           />
 
           <Animated.Image
@@ -105,7 +105,7 @@ export default function Day19Intro() {
                 ],
               },
             ]}
-            source={require('@assets/flowers/frangipani.png')}
+            source={require('@assets/ikea.png')}
           />
         </View>
         <TouchableOpacity
@@ -131,7 +131,7 @@ export default function Day19Intro() {
 const styles = StyleSheet.create({
   jasmineTopRight: {
     position: 'absolute',
-    top: -80,
+    top: -130,
     right: -30,
   },
   jasmineBottomLeft: {
