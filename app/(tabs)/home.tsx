@@ -16,6 +16,7 @@ import { router } from 'expo-router';
 import {
   albumArt,
   flowerFacts,
+  flowerImages,
   flowerList,
   instaVideos,
   personName,
@@ -47,6 +48,7 @@ export default function HomeScreen() {
 
         {/* Flower of the Day */}
         <View style={[styles.dayContainer, { backgroundColor: '#FCE0E5' }]}>
+          <Image style={styles.flowerDay} source={flowerImages[currentDay - 1]} />
           <MiffyText text="Flower of the day" isItalic color={Colors.miffyAccent} />
           <MiffyText text={flowerList[currentDay - 1]} size={68} color={Colors.miffySeconday} />
           <MiffyText text="Fun fact!" size={18} isItalic color={Colors.miffySeconday} />
@@ -208,6 +210,12 @@ const styles = StyleSheet.create({
     left: -50,
     transform: [{ rotate: '-24deg' }],
   },
+  flowerDay: {
+    position: 'absolute',
+    bottom: 65,
+    left: -75,
+    transform: [{ rotate: '24deg' }],
+  },
   songContainer: {
     backgroundColor: Colors.miffyAccent,
     gap: 24,
@@ -230,8 +238,5 @@ const styles = StyleSheet.create({
     fontSize: 26,
     color: 'white',
     textAlign: 'right',
-  },
-  songArtwork: {
-    borderRadius: 10,
   },
 });
