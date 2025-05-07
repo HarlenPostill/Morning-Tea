@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   guestMessageContainer: {
     flexDirection: 'row',
     gap: 12,
-    width: 180,
+    width: '100%',
   },
   guestMessageDivider: {
     backgroundColor: Colors.miffyOther,

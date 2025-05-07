@@ -21,7 +21,7 @@ export default function TabTwoScreen() {
   return (
     <AlternateScrollView>
       <MiffyText text="The Daily" color={Colors.miffySeconday} size={45} />
-      <MiffyText text="Completed 0/3" color={Colors.miffyAccent} isItalic size={24} />
+      <MiffyText text="Compete in the Gauntlet" color={Colors.miffyAccent} isItalic size={24} />
 
       <TouchableOpacity
         style={[
