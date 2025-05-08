@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { StyleSheet, Button, Image, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Button, TouchableOpacity, View, SafeAreaView } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -15,14 +15,17 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 
 import { useDayContext } from '../contexts/DayContext';
 
+import { DayPicker } from '@/components/DayPicker';
+
 export default function TabTwoScreen() {
   const { currentDay, isInitialized } = useDayContext();
 
-  return (
-    <AlternateScrollView>
-      <MiffyText text="The Daily" color={Colors.miffySeconday} size={45} />
-      <MiffyText text="Compete in the Gauntlet" color={Colors.miffyAccent} isItalic size={24} />
+  const title = `Amelie's Daily Games: Day ${currentDay}`;
 
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.miffyOther, padding: 40, gap: 16 }}>
+      <MiffyText text={title} color={Colors.miffySeconday} size={45} />
+      <MiffyText text="Compete in the Gauntlet" color={Colors.miffyAccent} isItalic size={24} />
       <TouchableOpacity
         style={[
           styles.mediaButton,
@@ -52,9 +55,13 @@ export default function TabTwoScreen() {
         <MiffyText text="Game 3" size={30} color="#fff" />
         <IconSymbol name="checkmark.circle.fill" color={'white'} />
       </TouchableOpacity>
-      <View style={{ height: 180 }} />
-      <Image style={styles.jasmine} source={require('@assets/jasmine-min.png')} />
-    </AlternateScrollView>
+      <MiffyText
+        text="Do you want to time travel to a different day?"
+        color={Colors.miffySeconday}
+        size={30}
+      />
+      <DayPicker />
+    </SafeAreaView>
   );
 }
 
@@ -68,11 +75,6 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
-  },
-  jasmine: {
-    position: 'absolute',
-    bottom: -100,
-    left: -25,
   },
   mediaButton: {
     width: '100%',

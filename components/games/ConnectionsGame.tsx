@@ -382,6 +382,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
+    width: '100%',
     backgroundColor: '#fff',
     paddingHorizontal: 10,
     paddingTop: 20,
@@ -401,7 +402,7 @@ const styles = StyleSheet.create({
   },
   board: {
     width: '100%',
-    maxWidth: 380,
+    maxWidth: '50%',
     alignItems: 'center',
     justifyContent: 'flex-start',
     gap: 8,
@@ -438,7 +439,7 @@ const styles = StyleSheet.create({
   },
   tile: {
     flex: 1,
-    aspectRatio: 1,
+    aspectRatio: 2,
     padding: 6,
     borderRadius: 6,
     justifyContent: 'center',
@@ -478,6 +479,7 @@ const styles = StyleSheet.create({
   controls: {
     width: '100%',
     flexDirection: 'row',
+    justifyContent: 'center',
     gap: 8,
     marginTop: 10,
   },
