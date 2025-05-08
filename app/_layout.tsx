@@ -54,8 +54,6 @@ function RootLayoutNav() {
             headerTintColor: Colors.light.tint,
           }}
         />
-        <Stack.Screen name="(intro)" options={{ headerShown: false }} />
-        <Stack.Screen name="(daily)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="dark" />
